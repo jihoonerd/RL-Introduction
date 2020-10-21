@@ -1,2 +1,3 @@
 * [Home](/README.md)
-* [Part 1](/Part1/ "Part 1")
+* [Chapter 1](/Chapter01/README.md)
+* [Chapter 2](/Chapter02/README.md)
