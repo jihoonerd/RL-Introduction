@@ -1,1 +1,0 @@
-# Chapter 02: Multi-armed Bandits
