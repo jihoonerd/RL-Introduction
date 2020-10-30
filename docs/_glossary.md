@@ -6,10 +6,13 @@
 Value function
 
 ##### 강화학습
-Reinforcement Learning, RL
+Reinforcement learning, RL
 
 ##### 관측
 Ovservation
+
+##### 기계학습
+Machine learning
 
 ##### 보상
 Reward
@@ -34,6 +37,9 @@ Optimization
 
 ##### 행동
 Action
+
+##### 행동가치
+Action value
 
 ##### 환경
 Environment

@@ -74,7 +74,7 @@ Planning은 위의 성질 중 exploration이 제외된 최적화, generalization
 
 ### Unsupervised Learning vs RL
 
-비지도학습(Unsupervised Machine Learning)은 위의 성질 중 지도학습과 동일하게 최적화와 generalization의 두 가지 성질을 가지나 지도학습과는 다르게 target label이 없다는 점에서 차이가 있다. 강화학습의 목적은 보상을 최대로 하는 것이고 비지도학습의 목적은 레이블이 없는 데이터의 구조/특징/패턴을 찾아내는 것이라는 점에서 강화학습과 비지도학습은 다른 목적을 갖는다.
+비지도학습(Unsupervised Machine Learning)은 위의 성질 중 지도학습과 동일하게 최적화와 generalization의 두 가지 성질을 가지나 지도학습과는 다르게 target label이 없다는 점에서 차이가 있다. 강화학습의 목적은 보상을 최대로 하는 것이고 비지도학습의 목적은 label이 없는 데이터의 구조/특징/패턴을 찾아내는 것이라는 점에서 강화학습과 비지도학습은 다른 목적을 갖는다.
 
 ### Imitation Learning vs RL
 
