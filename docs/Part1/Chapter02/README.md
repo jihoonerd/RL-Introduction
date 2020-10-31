@@ -67,27 +67,29 @@ $$
 
 단순하게 행동가치가 가장 큰 행동 $a$를 선택하는 것이다. 하지만 앞서 언급되었듯, greedy한 방식만 사용하게 되면 더 나은 행동을 찾을 수 있는 기회를 갖지 못한다. 따라서 간단한 대안으로 사용할 수 있는 방식은 일정 확률 $\varepsilon$에 대해 추정한 행동가치와 상관없이 선택 가능한 행동들 중에서 임의로 행동을 선택하는 것이다. 이 방식의 장점은 단순하면서도 시행이 많아지게 되면 모든 행동들이 sampling되면서 $Q_t(a)$가 $q_{*}(a)$로 수렴하게 된다는 것이다. 이러한 방식을 $\boldsymbol{\varepsilon}$-**greedy** 방법이라고 부른다.
 
-# TODO: HERE
-# The 10-armed Testbed
+## The 10-armed Testbed
 
 $\varepsilon$-greedy 방법이 greedy방법에 비해 정말 효과가 있는지를 알아보기 위해 다음과 같은 실험을 살펴보자.
 
-2,000번 랜덤시행을 한 10-armed bandit이 있다고 해보자. 각기 다른 값이 설정된 슬롯머신 10대가 있는 것이다. 그리고 acation은 각각 $a = 1, \ldots, 10$이라 하고 $q_{\*}(a)$는 평균 0, 분산이 1인 정규분포로 선택된 값이다. $q_{\*}$는 실제 action value로 agent는 알 수 없는 값임에 유의한다. agent는 회색밴드로 표현된 분포에 따라 reward를 받게 되며 이 값이 agent가 관측할 수 있는 reward이다. 이러한 테스트 상황을 *10-armed testbed*라고 부른다.
+2,000번 랜덤시행을 한 10-armed bandit이 있다고 해보자. 각기 다른 값이 설정된 슬롯머신 10대가 있는 것이다. 그리고 행동 각각 $a = 1, \ldots, 10$이라 하고 $q_{*}(a)$는 평균 0, 분산이 1인 정규분포로 선택된 값이다. $q_{*}$는 실제 행동가치로 agent는 알 수 없는 값임에 유의한다. agent는 회색밴드로 표현된 분포에 따라 보상을 받게 되며 이 값이 agent가 관측할 수 있는 보상이다. 이러한 테스트 상황을 **10-armed testbed**라고 부른다.
 
-![Fig_2.1](/assets/images/2020-07-18-RL-02-01-Multi-armed-Bandits/Fig_2.1.png){: .align-center}
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.1.png"/>
+<figcaption>Figure2.1: An example bandit problem from the 10-armed testbed.</figcaption>
+</figure>
+
 
 이 문제에 대해 sample-average method의 $\varepsilon$을 0, 0.01, 0.1로 다르게 적용해 각각 2000번 시행한 평균은 다음과 같다.
 
-![Fig_2.2](/assets/images/2020-07-18-RL-02-01-Multi-armed-Bandits/Fig_2.2.png){: .align-center}
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.2.png"/>
+<figcaption>Figure2.2: Average performance of $\epsilon$-greedy action-value methods on the 10-armed testbed.</figcaption>
+</figure>
 
-먼저 greedy한 전략을 썼을 떄의 평균 reward를 보면 1에 도착하고 증가하지 않는다. Action 3의 기댓값이 1.55로 action 3을 선택하는 최고의 전략에 비할 때 greedy한 agent는 suboptimal에 최적화 되었음을 알 수 있다. 아래의 최적 action 비율(여기서는 action 3을 선택한 경우)를 보더라도 greedy agent는 33%정도에 머무르고 있다. 대조적으로 $\varepsilon$-greedy agent는 모두 점진적으로 평균 reward와 최적 action 비율이 향상되는 것을 볼 수 있다. (물론 무한정 좋아지지는 않는다. 0.1로 설정된 경우 91% 확률로 최적 action을 선택한다) 충분히 exploration이 일어났다면 $\varepsilon$을 점차 줄여 더 높은 return은 기대할 수도 있다.
+먼저 greedy한 전략을 썼을 떄의 평균 보상을 보면 1에 도착하고 증가하지 않는다. 행동 3의 기댓값이 1.55로 행동 3을 선택하는 최고의 전략에 비할 때 greedy한 agent는 suboptimal에 최적화 되었음을 알 수 있다. 아래의 최적행동비율(여기서는 행동 3을 선택한 경우)를 보더라도 greedy agent는 33%정도에 머무르고 있다. 대조적으로 $\varepsilon$-greedy agent는 모두 점진적으로 평균 보상과 최적행동비율이 향상되는 것을 볼 수 있다. (물론 무한정 좋아지지는 않는다. 0.1로 설정된 경우 91% 확률로 최적행동을 선택한다) 충분히 exploration이 일어났다면 $\varepsilon$을 점차 줄여 더 높은 return을 기대할 수도 있다.
 
-$\varepsilon$-greedy의 선택은 testbed의 노이즈에 따라 다르게 선택될 수 있다. 지금은 testbed가 평균 0, 분산이 1이었지만, 분산이 10이었다면 더 많은 exploration이 필요했을 것이고 $\varepsilon$-greedy와 greedy의 차이는 더 커졌을 것이다. 하지만 분산이 0이었다면 greedy는 시행 즉시 $q_{\*}$를 알 수있게 될 것이므로 $\varepsilon$-greedy가 필요없는 상황이 된다. 하지만 이런 deterministic한 상황이라 하더라도 $q_{\*}$가 조금씩 변하는 non-stationary한 상황이라면 exploration을 하는 것이 greedy한 것보다 나은 선택이 된다.
+$\varepsilon$-greedy의 선택은 testbed의 노이즈에 따라 다르게 선택될 수 있다. 지금은 testbed가 평균 0, 분산이 1이었지만, 분산이 10이었다면 더 많은 exploration이 필요했을 것이고 $\varepsilon$-greedy와 greedy의 차이는 더 커졌을 것이다. 하지만 분산이 0이었다면 greedy는 시행 즉시 $q_{*}$를 알 수있게 될 것이므로 $\varepsilon$-greedy가 필요없는 상황이 된다. 하지만 이런 deterministic한 상황이라 하더라도 $q_{*}$가 조금씩 변하는 non-stationary한 상황이라면 nongreedy action이 기존의 greedy action보다 높은 return을 제공할 가능성이 있으므로 exploration이 필요하다.
 
-# 4 Conclusion
-
-$k$-armed bandit problem은 단순한 문제이지만 강화학습의 특징 중 특히 Evaluative feedback성질을 잘 보여주는 예제이다. 이번 포스팅에서는 강화학습에서의 Feedback특징과 대표적인 문제인 $k$-armed bandit problem, 그리고 Action-value Method를 통한 접근방법을 알아보았다. 그리고 $\varepsilon$-greedy와 greedy전략을 10-armed testbed에서 비교해 보았다.
-
-# 5 Reference
+## Reference
 
 * [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
