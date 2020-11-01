@@ -40,9 +40,9 @@ $$
 q_{*}(a) \doteq \mathbb{E}[R_t \vert A_t = a]
 $$
 
-즉, 레버마다 timestep $t$에서 행동 $a$를 선택했을 때의 점수에 대한 기댓값을 알 수 있다면 그 다음 선택은 그 레버만 신나게 당기면 되는 것이다. 우리는 정확한 값은 알 수 없고 추정만 할 수 있으므로 timestep $t$에서 추정한 행동 $a$에 대한 가치를 $Q_t(a)$라고 하며 이 값을 실제 가치인 $q_{*}(a)$와 최대한 가깝게 추정해내는 것이 목표가 되는 것이다.
+즉, 레버마다 time step $t$에서 행동 $a$를 선택했을 때의 점수에 대한 기댓값을 알 수 있다면 그 다음 선택은 그 레버만 신나게 당기면 되는 것이다. 우리는 정확한 값은 알 수 없고 추정만 할 수 있으므로 time step $t$에서 추정한 행동 $a$에 대한 가치를 $Q_t(a)$라고 하며 이 값을 실제 가치인 $q_{*}(a)$와 최대한 가깝게 추정해내는 것이 목표가 되는 것이다.
 
-그렇다면 학습 중의 상황을 생각하자. 행동가치를 추정하는 과정에서 그 값이 얼마나 정확한지를 떠나서 timestep $t$에서 가장 큰 가치를 갖는 행동이 존재하게 된다. 이러한 행동을 **greedy action**이라 한다. 해당 시점에서 가장 큰 가치를 갖는 행동을 선택하는 것을 현재 알고있는 행동가치에 대한 지식을 **exploiting**한다고 한다. Nongreedy action을 선택하는 것은 **exploring**한다고 한다. 이미 확률분포에 대한 확신이 있다면 exploiting하는 것이 효율적이지만 불확실성이 크고 앞으로 많은 시도를 해볼 수 있다면 exploring을 통해 더 좋은 결과를 얻을 가능성을 탐색하는 것이 좋을 것이다. Exploring하는 동안 단기적으로는 보상이 적을 수 있지만 더 나은 행동을 찾게 된다면 새로운 행동을 exploit하면서 장기적으로 더 큰 보상을 기대할 수 있다. Exploitation과 exploration을 동시에 할 수는 없으므로 이 둘의 균형을 조절하는 것은 그 자체로 강화학습에서 중요한 문제이다.
+그렇다면 학습 중의 상황을 생각하자. 행동가치를 추정하는 과정에서 그 값이 얼마나 정확한지를 떠나서 time step $t$에서 가장 큰 가치를 갖는 행동이 존재하게 된다. 이러한 행동을 **greedy action**이라 한다. 해당 시점에서 가장 큰 가치를 갖는 행동을 선택하는 것을 현재 알고있는 행동가치에 대한 지식을 **exploiting**한다고 한다. Nongreedy action을 선택하는 것은 **exploring**한다고 한다. 이미 확률분포에 대한 확신이 있다면 exploiting하는 것이 효율적이지만 불확실성이 크고 앞으로 많은 시도를 해볼 수 있다면 exploring을 통해 더 좋은 결과를 얻을 가능성을 탐색하는 것이 좋을 것이다. Exploring하는 동안 단기적으로는 보상이 적을 수 있지만 더 나은 행동을 찾게 된다면 새로운 행동을 exploit하면서 장기적으로 더 큰 보상을 기대할 수 있다. Exploitation과 exploration을 동시에 할 수는 없으므로 이 둘의 균형을 조절하는 것은 그 자체로 강화학습에서 중요한 문제이다.
 
 교재에서는 기초적인 방식의 Balancing methods를 사용해 항상 exploitation을 사용하는 것 보다 balancing method를 쓰는게 더 좋은 결과를 보여준다는 것을 보여주며 복잡한 형태의 balancing method는 따로 다루지 않는다.
 
@@ -57,7 +57,7 @@ $$
 >
 > 행동가치를 추정하는 가장 간단한 방법으로 행동을 취했을 때 얻은 결과에 단순 평균을 취하는 방법을 생각해 볼 수 있다. 이러한 방식을 **Sample-average Method** 라고 한다.
 > $$\begin{aligned}Q_t(a) &\doteq \frac{\text{sum of rewards when } a \text{ taken prior to }t}{\text{number of times } a \text{ taken prior to }t} \\ &= \frac{\sum_{i=1}^{t-1}  R_i \cdot \mathbb{1}_{A_i=a}}{\sum_{i=1}^{t-1} \mathbb{1}_{A_i=a}} \end{aligned}$$
-> 위 식에서 $\mathbb{1}_{\text{predicate}}$은 predicate이 True일 때 1, 아닐 때 0인 random variable이다. 만약 분모가 0이라면 사전에 정의된 Default값을 value로 반환하며 분모가 무한히 커지면, 즉 timestep $t$에서의 Action이 무한히 커지면 큰 수의 법칙(The law of large numbers)에 의해 $Q_t(a)$는 $q_{*}(a)$로 수렴한다.
+> 위 식에서 $\mathbb{1}_{\text{predicate}}$은 predicate이 True일 때 1, 아닐 때 0인 random variable이다. 만약 분모가 0이라면 사전에 정의된 Default값을 value로 반환하며 분모가 무한히 커지면, 즉 time step $t$에서의 Action이 무한히 커지면 큰 수의 법칙(The law of large numbers)에 의해 $Q_t(a)$는 $q_{*}(a)$로 수렴한다.
 
 행동가치를 값이 있을때, greedy한 선택은 다음과 같이 표현할 수 있다.
 
@@ -89,6 +89,45 @@ $\varepsilon$-greedy 방법이 greedy방법에 비해 정말 효과가 있는지
 먼저 greedy한 전략을 썼을 떄의 평균 보상을 보면 1에 도착하고 증가하지 않는다. 행동 3의 기댓값이 1.55로 행동 3을 선택하는 최고의 전략에 비할 때 greedy한 agent는 suboptimal에 최적화 되었음을 알 수 있다. 아래의 최적행동비율(여기서는 행동 3을 선택한 경우)를 보더라도 greedy agent는 33%정도에 머무르고 있다. 대조적으로 $\varepsilon$-greedy agent는 모두 점진적으로 평균 보상과 최적행동비율이 향상되는 것을 볼 수 있다. (물론 무한정 좋아지지는 않는다. 0.1로 설정된 경우 91% 확률로 최적행동을 선택한다) 충분히 exploration이 일어났다면 $\varepsilon$을 점차 줄여 더 높은 return을 기대할 수도 있다.
 
 $\varepsilon$-greedy의 선택은 testbed의 노이즈에 따라 다르게 선택될 수 있다. 지금은 testbed가 평균 0, 분산이 1이었지만, 분산이 10이었다면 더 많은 exploration이 필요했을 것이고 $\varepsilon$-greedy와 greedy의 차이는 더 커졌을 것이다. 하지만 분산이 0이었다면 greedy는 시행 즉시 $q_{*}$를 알 수있게 될 것이므로 $\varepsilon$-greedy가 필요없는 상황이 된다. 하지만 이런 deterministic한 상황이라 하더라도 $q_{*}$가 조금씩 변하는 non-stationary한 상황이라면 nongreedy action이 기존의 greedy action보다 높은 return을 제공할 가능성이 있으므로 exploration이 필요하다.
+
+
+## Incremental implementation
+
+단순하지만 행동가치를 추정하는 방법인 sample-average method를 보았다. 이번에는 제한된 자원만 있는 상황에서 어떻게 sample-average method를 적용할 수 있는지, 그리고 실제 행동가치가 고정된채로 유지되는 것이 아니라 변화하는 환경에서는 어떻게 대응할지에 대해 알아보자.
+
+Incremental implemenation에서 다루는 내용은 간단하게 말하면 이동평균으로 평균을 구하는 방식이다. 어떤 armed bandit의 행동가치를 다음과 같이 정의해보자.
+
+$$ Q_{n} \doteq \frac{R_{1} + R_{2} + \cdots + R_{n-1}}{n - 1} $$
+
+위 식은 $n-1$ time step까지의 보상 평균에 해당하는 값으로 보상을 모두 들고다닐 필요 없이 평균값 하나만 저장하면 되어 많은 메모리공간을 차지하지 않는다. 아래 유도는 이전까지의 행동가치와 현재 보상, 이 두 정보만 알면 행동가치를 update할 수 있음을 보인다.
+
+$$
+\begin{aligned}
+Q_{n+1} &= \frac{1}{n} \sum_{i=1}^{n} R_{i} \\
+&= \frac{1}{n} \left( R_{n} + \sum_{i=1}^{n-1} R_{i} \right) \\
+&= \frac{1}{n} \left( R_{n} + (n-1) \frac{1}{n-1} \sum_{i=1}^{n-1} R_{i} \right) \\
+&= \frac{1}{n} \left( R_{n} + (n-1) Q_{n} \right) \\
+&= \frac{1}{n} \left( R_{n} + n Q_{n} - Q_{n} \right) \\
+&= Q_{n} + \frac{1}{n} \left[ R_{n} - Q_{n} \right]
+\end{aligned}
+$$
+
+행동가치를 위와 같이 update 할 수 있다는 것은 간단하게 확인이 되지만 더 중요한 것은 위와 같은 update의 형태이다. 이 책 전반에 걸쳐서 다음과 같은 update 방식은 매우 자주 등장한다.
+
+$$ \operatorname{NewEstimate} \leftarrow \operatorname{OldEstimate} + \operatorname{StepSize} \left[ \operatorname{Target} - \operatorname{OldEstimate} \right] $$
+
+여기서 $ \left[ \operatorname{Target} - \operatorname{OldEstimate} \right] $부분을 추정에 대한 **error**라고 한다. 또한 $\operatorname{StepSize}$는 time step이 증가할수록 점점 작아지는 변화하는 값임에 유의하자.($n$번째 행동에 대한 보상은 $\operatorname{StepSize}$가 $\frac{1}{n}$만큼 적용된다) 이후 책에서는 $ \operatorname{StepSize} $를 $\alpha$, 또는 $\alpha_{t}(a)$로 표기한다.
+
+### Simple Bandit Algorithm
+
+Sample average method와 $\varepsilon$-greedy을 사용해 armed-bandit의 행동가치를 추정하는 bandit 알고리즘의 pseudocode는 다음과 같다.
+
+<figure align=center>
+<img src="assets/images/Chapter02/simple_bandit_algorithm.png" width=70% height=70%/>
+<figcaption>Simple Bandit Algorithm</figcaption>
+</figure>
+
+우선 모든 행동 대해 행동가치와 시행횟수는 0으로 초기화가 된다. 그리고 시행이 발생할때 마다 loop을 돌면서 값을 update 하는 구조이다. $\varepsilon$-greedy이므로 $1-\varepsilon$의 확률로 행동가치가 가장 큰 행동을 선택하고 $\varepsilon$의 확률로 무작위 행동을 선택한다. 선택한 행동으로 bandit의 레버를 당기면 보상이 주어지고 해당 게임은 끝나게 된다. (후에 다루겠지만 이러한 성질로 인해 bandit은 1-step MDP로 볼 수 있다) 시행을 했으니 counter 역할을 하는 $N(A)$를 1 올려주고 위의 식을 이용해 행동가치를 update해주면 된다.
 
 ## Reference
 
