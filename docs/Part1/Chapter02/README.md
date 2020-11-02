@@ -129,6 +129,45 @@ Sample average method와 $\varepsilon$-greedy을 사용해 armed-bandit의 행�
 
 우선 모든 행동 대해 행동가치와 시행횟수는 0으로 초기화가 된다. 그리고 시행이 발생할때 마다 loop을 돌면서 값을 update 하는 구조이다. $\varepsilon$-greedy이므로 $1-\varepsilon$의 확률로 행동가치가 가장 큰 행동을 선택하고 $\varepsilon$의 확률로 무작위 행동을 선택한다. 선택한 행동으로 bandit의 레버를 당기면 보상이 주어지고 해당 게임은 끝나게 된다. (후에 다루겠지만 이러한 성질로 인해 bandit은 1-step MDP로 볼 수 있다) 시행을 했으니 counter 역할을 하는 $N(A)$를 1 올려주고 위의 식을 이용해 행동가치를 update해주면 된다.
 
+
+## Tracking a Nonstationary Problem
+
+지금까지 다룬 bandit 문제는 초기 분포가 주어지고 그 분포가 변하지 않는다고 가정하였다. 하지만 조금더 영악한 bandit일 때를 생각해보자. 만약 특정 bandit의 return 기댓값이 높다는 것이 알려지면 사람들은 주구장창 해당 bandit의 레버만 당겨버릴 것이다. 만약 bandit이 스스로의 분포를 조금씩 바꾸어간다면 어떻게 될까? 문제가 더 dynamic해지게 된다. 지금의 최선책이 이후에도 최선책임을 보장할 수 없게 되는 것이다. 그리고 실제 문제들은 고정된 확률분포(stationary)보다는 바뀌는(nonstationary) 경우가 더 많다. 문제가 바뀌었으므로 전략도 바뀌어야 한다. 이에 대응하는 방법으로 최근 보상에 더 집중하는, 즉 가중치를 더 주는 방법을 생각해볼 수 있다. 아무래도 최근 값이 행동가치 더 많은 영향을 준다면 nonstationary한 실제 행동가치를 추종(tracking)할 수 있을 것이라는게 기본적인 아이디어다. 위의 공식에서 가중치에 해당하는 부분은 step-size parameter였다. 앞에서는 모든 step에 대해 동일한 가중치를 주었다면 이번에는 최근 가중치를 더 크게 주도록 설정하면 된다. Step-size parameter를 $\alpha$라고 하고 위의 식을 전개하면 다음과 같이 정리할 수 있다.
+
+$$
+\begin{aligned}
+Q_{n+1} &\doteq Q_{n} + \alpha[R_{n} - Q_{n}]\\
+&= \alpha R_{n} + (1-\alpha) Q_{n} \\
+&= \alpha R_{n} + (1-\alpha) [\alpha R_{n-1} + (1-\alpha) Q_{n-1}] \\
+&= \alpha R_{n} + (1-\alpha)\alpha R_{n-1} + (1-\alpha)^{2} Q_{n-1} \\
+&= \alpha R_{n} + (1-\alpha)\alpha R_{n-1} + (1-\alpha)^{2} \alpha R_{n-2} + \\
+&\quad \cdots +(1-\alpha)^{n-1} \alpha R_{1} + (1-\alpha)^{n} Q_{1} \\
+&= (1-\alpha)^{n} Q_{1} + \sum_{i=1}^{n} \alpha (1-\alpha)^{n-i} R_{i}
+\end{aligned}
+$$
+
+$\alpha \in (0, 1]$이며 첫번째 줄을 보면 $\alpha$라는 가중치가 현재 보상에 적용되고 나머지 $1-\alpha$는 최근 행동가치의 가중치로 들어간 것을 볼 수 있다. 이후 전개식은 식을 바꾸어 쓴 것일 뿐이므로 가중치의 합은 1로 보존된다. 즉, $ (1-\alpha)^{n} + \sum_{i=1}^{n} \alpha(1-\alpha)^{n-i} = 1 $이다. 주목할 부분은 현재의 보상 $R_{i}$의 가중치인 $ \alpha(1-\alpha)^{n-i} $인데, 가장 최근인 $R_{n}$의 가중치는 $\alpha$이다. 반면 최초의 보상 $R_{1}$의 계수는 $\alpha (1 - \alpha)^{n-1}$이다.  시행 $i$가 커질수록 $ (1-\alpha) < 1$이므로 더 큰 가중치를 받게 된다. 매 time step이 커질수록 $1/(1-\alpha) $배만큼 큰 가중치를 받으므로 이를 **exponential recency-weighted average**라고도 한다.
+
+이 때, 아무 step-size parameter나 사용한다고 해서 action value가 수렴하지는 않는다. 수렴성을 보장하기 위해서 step-size parameter는 다음 두 조건을 만족해야 한다.
+
+$$
+\begin{aligned}
+\sum_{n=1}^{\infty} \alpha_{n}(a) &= \infty \\
+\sum_{n=1}^{\infty} \alpha_{n}^{2}(a) &< \infty
+\end{aligned}
+$$
+
+첫번째 식은 initial condition과 random fluctuation을 넘어서기 위해서 step-size parameter는 충분히 커야한다는 의미이고 두번째 식은 수렴을 보장해야 하므로 충분히 작아야 한다는 것이다. Sample-average method에서 사용한 step-size parameter는 $\alpha_{n}(a) = \frac{1}{n}$이었는데 이는 위의 두 식을 만족한다.
+
+$$
+\begin{aligned}
+\sum_{n=1}^{\infty} \frac{1}{n} &= \infty \\
+\sum_{n=1}^{\infty} \frac{1}{n^{2}} &= \frac{\pi^{2}}{6} < \infty
+\end{aligned}
+$$
+
+하지만 실무적으로는 위의 두 조건을 만족한다고 해도 수렴하는 속도가 너무 느리거나 수렴속도를 맞추기 위해서 상당한 tuning을 거쳐야 한다는 문제가 있다. 따라서 step-size parameter의 수렴조건은 이론적인 의의는 있지만 application이나 실험적 연구에서는 거의 사용되지 않는다.
+
 ## Reference
 
 * [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
