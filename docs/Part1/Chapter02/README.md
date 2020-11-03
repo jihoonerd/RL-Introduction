@@ -168,6 +168,26 @@ $$
 
 하지만 실무적으로는 위의 두 조건을 만족한다고 해도 수렴하는 속도가 너무 느리거나 수렴속도를 맞추기 위해서 상당한 tuning을 거쳐야 한다는 문제가 있다. 따라서 step-size parameter의 수렴조건은 이론적인 의의는 있지만 application이나 실험적 연구에서는 거의 사용되지 않는다.
 
+
+## Optimistic Initial Values
+
+학습을 더 잘 시키기위한 기법 중 하나인 optimistic initial value에 대해서 알아보자.
+
+지금까지 다룬 행동가치기반의 접근방법뿐만 아니라 앞으로 다룰 방법들 중 대부분은 어떠한 형태로든 초기값을 설정해주어야 한다. 사전지식(prior)이 없는 상황이라면 uniform하게 설정하거나 단순하게 난수로 생성하는 경우가 많다. 물론 사전지식이 있다면 이를 반영해 초기값을 설정할 수도 있다. 학습과정의 시작점은 이 초기값에 의해 정해지는 만큼 초기값을 기준으로 하는 iterative algorithm들은 초기값에 bias될 수 밖에 없다.
+
+Optimistic inital value는 exploration을 장려하는 방향으로 초기값을 설정하는 기법이다. 아이디어는 매우 간단하다. 모든 행동에 대한 행동가치를 양의 특정 값으로 설정하는 것이다. 이렇게되면 agent입장에서는 초반에 모든 행동들이 **가치있는** 행동으로 보이게 된다. 학습과정에서 특정한 행동의 결과가 좋지 않았다면 여기서 오는 실망은 해당 행동의 행동가치를 감소시키게 될 것이다. 초기값이 모두 양수로 설정되었으므로 agent는 방금 시도한 행동을 제외한 나머지 행동을 더 가치있다고 생각하며 optimistic inital value는 이를 이용해 exploration을 촉진시킬 수 있다.
+
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.3.png" width=50% height=50%/>
+<figcaption>Figure2.3: The effect of optimistic inital action-value estimates on the 10-armed testbed. Both methods used a constant step-size parameter, $\alpha=0.1$.</figcaption>
+</figure>
+
+위의 그림은 optimistic initial value와 $\varepsilon$-greedy를 10-armed bandit에 적용했을 때의 결과이다. Optimistic inital value를 적용한 setting에서는 모든 행동에 대한 행동가치를 5로 부여하였다. Agent는 모르는 정보지만, 실제 행동가치는 $q_{*}(a)$가 $\mathcal{N}(0, 1)$에서 추출된 것임을 감안하면 매우 optimistic한 값으로 초기값을 설정했음을 알 수 있다. 그리고 이러한 설정으로 인해 agent는 baseline보다 훨씬 더 exploration을 적극적으로 하게 된다. Initial value $Q_1(a) = 5$로 시작하지만 학습이 진행됨에 따라 행동의 추정가치는 감소하기 시작할 것이고 초반부에 다양한 행동을 시도할 것임을 짐작할 수 있다. 대조군인 baeline은 $\varepsilon$-greedy를 사용하고 initial value가 $Q_1(a) = 0$으로 설정되었다.
+
+초반부를 살펴보면 optimistic initial value의 특징이 두드러지는데, 더 많은 탐색을 하게 되므로 optimial action 선택비율이 $\varepsilon$-greedy에 비해 훨씬 낮다. 하지만 시간이 지나면서 optimal action을 baseline인 $\varepsilon$-greedy 보다 더 빠르게 찾아 optimal action의 선택비율이 급격하게 높아지는 것을 볼 수 있다. 방법이 아주 간단한 점을 감안할 때, 유의한 이점이라고 볼 수 있다.
+
+하지만 이러한 optimistic initial value를 범용적으로 사용할 수 있는 것은 아니다. 당장 nonstationary 문제들에는 적용하기가 어렵다. 초반부 exploration을 장려하는 효과는 있지만 문제가 nonstationary라면 확률분포가 바뀌게되어 초반의 exploration 결과를 계속 사용할 수 없으므로 효율적이지 않다. 이처럼 초기값에 사용하는 trick들은 대게 nonstationary문제에 적용하기 어렵다는 단점이 있다.
+
 ## Reference
 
 * [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
