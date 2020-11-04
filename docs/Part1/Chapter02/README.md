@@ -188,6 +188,29 @@ Optimistic inital value는 exploration을 장려하는 방향으로 초기값을
 
 하지만 이러한 optimistic initial value를 범용적으로 사용할 수 있는 것은 아니다. 당장 nonstationary 문제들에는 적용하기가 어렵다. 초반부 exploration을 장려하는 효과는 있지만 문제가 nonstationary라면 확률분포가 바뀌게되어 초반의 exploration 결과를 계속 사용할 수 없으므로 효율적이지 않다. 이처럼 초기값에 사용하는 trick들은 대게 nonstationary문제에 적용하기 어렵다는 단점이 있다.
 
+## Upper-Confidence-Bound Action Selection
+
+Optimistic initial value가 초기값에 대한 trick이었다면 Upper-Confidence-Bound(UCB)는 행동선택에 대한 trick이다. $\varepsilon$-greedy는 non-greedy한 방식으로 새로운 행동을 시도하며 exploration을 해볼 수 있는 간단하지만 강력한 방법이다. 하지만 UCB는 $\varepsilon$-greedy가 $\varepsilon$의 확률로 무작위로 action을 고른다는 것에 주목한다. Q-value, 즉 행동가치 중에는 이미 여러번 해당 행동을 시도해서 거의 수렴한 Q-value도 있을 것이고, 정말 시도를 아예 해보지 않아 Q값을 제대로 추정하지 앟은 Q-value도 있을 것이다.
+
+UCB는 Exploration을 할 때, "무작위로 행동을 고르지 말고, 지금까지 선택이 덜 되어 더 불확실한 행동가치를 갖는 행동을 선택하도록 유도할 수는 없을까?"
+
+UCB는 이러한 문제의식을 반영한 방법이다. UCB에서 non-greedy action은 다음의 식에 따라 선택한다.
+
+$$
+A_{t} \doteq \argmax_{a} \left[ Q_{t}(a) + c \sqrt{\frac{\ln t}{N_{t}(a)}} \right]
+$$
+
+$\argmax_{a} Q_{t}(a)$로만 고른다면 greedy방법이다. 하지만 뒤의 항이 UCB의 특징을 설명해준다. 우선 분자의 log를 보면, log는 증가함수이므로 time step $t$가 증가할수록 선택할 가능성이 커진다고 볼 수 있다. 반면 $N_{t}(a)$는 해당 time step이전까지 행동 a가 선택된 횟수를 의미한다. 더 많이 선택될수록 분모가 커지면서 Q-value 추정에 대한 불확실성이 적어진다는 것을 반영해준다. 이 둘의 조합인 $\sqrt{\frac{\ln t}{N_{t}(a)}}$가 UCB의 불확실성을 표현하게 된다. 행동 a가 선택되면 $N_{t}(a)$가 증가하면서 해당 행동의 불확실성은 감소하게 된다. 반면, 분자인 $\ln t$는 행동 a의 선택여부와 상관없이 증가하게 된다. log값이므로 증가폭은 점점 감소하지만 여전히 상한(upper bound)이 정해지지는 않는다. 따라서 분자항은 불확실성을 계속 증가시키며 선택되지 않은 행동이 선택될 가능성을 크게 만들어주고 분모항에서는 실제 행동 a가 발생했을 경우에 커지게되면서 불확실성을 낮추어주게 된다. 예로, 꽤 많은 time step이 지났는데 한번도 실행되지 않은 action의 경우 $ \underset{a}{\operatorname{argmax}} \left[ Q_{t}(a) + c \sqrt{\frac{\ln t}{N_{t}(a)}} \right] $에 의해 선택될 가능성이 상대적으로 커지게 될 것이다. $c$는 양수로 exploration의 정도를 결정하게 된다. $c$값이 크다면 행동선택에 있어서 불확실성의 가중치가 더 커지게 될 것이다.
+
+Optimistic initial value와 마찬가지로 UCB를 적용한 것과 $\varepsilon$-greedy의 결과를 10-armed bandit에서 비교하면 다음과 같다.
+
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.4.png" width=50% height=50%/>
+<figcaption>Figure2.4: Average performance of UCB action selection on the 10-armed testbed.</figcaption>
+</figure>
+
+UCB는 전반적으로 잘 작동하지만 bandit문제와 같이 단순한 문제를 벗어나면 적용하기가 어렵다는 단점이 존재한다. UCB 역시도 nonstationary 문제에 취약하며 상태공간이 큰 경우에도 적용하기가 어렵다. $N_{t}(a)$를 충분히 확보해야 불확실성을 잘 추정할 수 있는데, 상태공간이 매우 크다면 각 상태에서 특정 행동을 하는 횟수 자체가 매우 적어질 것이기 때문이다. 특히, 이렇게 상태공간이 큰 상황에서는 function approximator를 사용해 상태공간에 대해 근사를 하게 되는데 이러한 function approximation을 하게 될 경우 불확실성을 반영하기가 어려워져 UCB 사용에 어려움이 생긴다.
+
 ## Reference
 
 * [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
