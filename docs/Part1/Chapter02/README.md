@@ -86,7 +86,7 @@ $\varepsilon$-greedy 방법이 greedy방법에 비해 정말 효과가 있는지
 <figcaption>Figure2.2: Average performance of $\epsilon$-greedy action-value methods on the 10-armed testbed.</figcaption>
 </figure>
 
-먼저 greedy한 전략을 썼을 떄의 평균 보상을 보면 1에 도착하고 증가하지 않는다. 행동 3의 기댓값이 1.55로 행동 3을 선택하는 최고의 전략에 비할 때 greedy한 agent는 suboptimal에 최적화 되었음을 알 수 있다. 아래의 최적행동비율(여기서는 행동 3을 선택한 경우)를 보더라도 greedy agent는 33%정도에 머무르고 있다. 대조적으로 $\varepsilon$-greedy agent는 모두 점진적으로 평균 보상과 최적행동비율이 향상되는 것을 볼 수 있다. (물론 무한정 좋아지지는 않는다. 0.1로 설정된 경우 91% 확률로 최적행동을 선택한다) 충분히 exploration이 일어났다면 $\varepsilon$을 점차 줄여 더 높은 return을 기대할 수도 있다.
+먼저 greedy한 전략을 썼을 떄의 평균 보상을 보면 1에 도착하고 증가하지 않는다. 행동 3의 기댓값이 1.55로 행동 3을 선택하는 최고의 전략에 비할 때 greedy한 agent는 suboptimal에 최적화 되었음을 알 수 있다. 아래의 optimal action비율(여기서는 행동 3을 선택한 경우)를 보더라도 greedy agent는 33%정도에 머무르고 있다. 대조적으로 $\varepsilon$-greedy agent는 모두 점진적으로 평균 보상과 optimal action비율이 향상되는 것을 볼 수 있다. (물론 무한정 좋아지지는 않는다. 0.1로 설정된 경우 91% 확률로 optimal action을 선택한다) 충분히 exploration이 일어났다면 $\varepsilon$을 점차 줄여 더 높은 return을 기대할 수도 있다.
 
 $\varepsilon$-greedy의 선택은 testbed의 노이즈에 따라 다르게 선택될 수 있다. 지금은 testbed가 평균 0, 분산이 1이었지만, 분산이 10이었다면 더 많은 exploration이 필요했을 것이고 $\varepsilon$-greedy와 greedy의 차이는 더 커졌을 것이다. 하지만 분산이 0이었다면 greedy는 시행 즉시 $q_{*}$를 알 수있게 될 것이므로 $\varepsilon$-greedy가 필요없는 상황이 된다. 하지만 이런 deterministic한 상황이라 하더라도 $q_{*}$가 조금씩 변하는 non-stationary한 상황이라면 nongreedy action이 기존의 greedy action보다 높은 return을 제공할 가능성이 있으므로 exploration이 필요하다.
 
@@ -210,6 +210,107 @@ Optimistic initial value와 마찬가지로 UCB를 적용한 것과 $\varepsilon
 </figure>
 
 UCB는 전반적으로 잘 작동하지만 bandit문제와 같이 단순한 문제를 벗어나면 적용하기가 어렵다는 단점이 존재한다. UCB 역시도 nonstationary 문제에 취약하며 상태공간이 큰 경우에도 적용하기가 어렵다. $N_{t}(a)$를 충분히 확보해야 불확실성을 잘 추정할 수 있는데, 상태공간이 매우 크다면 각 상태에서 특정 행동을 하는 횟수 자체가 매우 적어질 것이기 때문이다. 특히, 이렇게 상태공간이 큰 상황에서는 function approximator를 사용해 상태공간에 대해 근사를 하게 되는데 이러한 function approximation을 하게 될 경우 불확실성을 반영하기가 어려워져 UCB 사용에 어려움이 생긴다.
+
+## Gradient Bandit Algorithms
+
+Sample-average method에서는 행동가치를 추정해서 행동에 대한 가치를 부여하였다. 하지만 좌우로 가는 두 가지 행동에서 선택해야하는 상황일 때, 왼쪽과 오른쪽의 행동가치가 10, 100이든 1, 10이든 greedy하게 결정한다면 행동가치의 절대적인 크기는 중요하지 않다. "그렇다면 행동을 결정할 때 상대적인 크기 비교로 접근해보는건 어떨까?"라는 관점이 여기서 다룰 gradient bandit algorithm의 핵심이다.
+
+Gradient bandit algorithm에서는 절대적인 행동가치가 아닌 행동에 대한 preference에 중점을 둔다. Time step $t$에서 action $a$에 대한 numerical preference를 $H_{t}(a) \in \mathbb{R}$라고 할 때, preference가 큰 $H_{t}(a)$를 더 자주 고르게 될 것이다. 행동가치는 현재 상태에서 받을 것으로 기대되는 return의 기댓값이었다. 하지만 preference는 보상의 관점으로 해석되지는 않는다. 물론, 궁극적으로는 더 높은 return을 제공하는 행동에 대해 더 높은 preference를 가져야하겠지만 preference가 가리키는 값이 return을 직접적으로 의미하지는 않는다는 차이가 있다. 이렇게 각 행동에 대한 preference인 $H_{t}(a)$가 있을 때, 이를 확률 다루기위해 soft-max distribution을 사용한다.
+
+$$
+\text{Pr} \{ A_{t} = a \} \doteq \frac{\exp^{H_{t} (a)}}{\sum_{b=1}^{k} \exp^{H_{t}(b)}} \doteq \pi_{t} (a)
+$$
+
+여기서 $\pi_{t} (a)$는 time step $t$에서 action $a$를 선택할 확률을 말한다. 이외에는 앞에서 다룬 방식과 비슷하다. 초기값으로는 특정 action에 대해 preference를 갖지 않도록 0과 같은 값으로 할당해준다. 이후에는 stochastic gradient descent를 활용해 학습을 시키면 된다.
+
+### The Bandit Gradient Algorithm as Stochastic Gradient Ascent
+
+Preference도 결국에는 더 높은 reward의 기댓값을 갖도록 업데이트해야한다. $ \left( \mathbb{E}[R_{t}] = \sum_{x} \pi_{t}(x) q_{*}(x) \right) $
+
+$$
+H_{t+1} (a) \doteq H_{t} (a) + \alpha \frac{\partial \mathbb{E} [R_{t}]}{\partial H_{t} (a)}  
+$$
+
+물론 실제 행동가치인 $q_{*}$를 알 수는 없으므로 정확한 gradient를 구할 수는 없다. 하지만 이후에 나올 업데이트 방법의 기댓값은 위 식의 업데이트와 같음이 보장된다. 모든 가능한 sample에 대해 업데이트를하면 정확하게 일치할 것이고 stochastic하게 접근하더라도 많은 minibatch들에 대해 적용하면 위의 ideal update에 근사시킬 수 있다.
+
+이제 위의 식을 바탕으로 실제 알고리즘에서 사용할 업데이트 식을 유도해보자.
+
+$$
+\begin{aligned}
+\frac{\partial \mathbb{E}[R_{t}]}{\partial H_{t} (a)} &= \frac{\partial}{\partial H_{t} (a)} \left[ \sum_{x} \pi_{t} (x) q_{*}(x) \right] \\
+&= \sum_{x} q_{*}(x) \frac{\partial \pi_{t} (x)}{\partial H_{t} (a)} \\
+&= \sum_{x} \left( q_{*}(x) - B_{t} \right) \frac{\partial \pi_{t}(x)}{\partial H_{t} (a)}
+\end{aligned}
+$$
+
+$B_{t}$는 baseline으로 $x$와 무관하게 구성된다. 여기서 임의로 $b_{t}$를 추가해도 상관이 없는 이유는 $ \sum_{x} \frac{\partial \pi_{t}(x)}{\partial H_{t} (a)} = 0 $이기 때문이다. $H_{t} (a)$에 의한 확률 $\pi$의 변화량은 각기 다를 수 있으나 확률이므로 이 모두를 더한 값은 0이되어야 하기 때문이다.
+
+그 다음에 사용하는 계산 trick은 $ \pi_{t}(x) $를 분모분자에 곱해주는 것이다. 이렇게 하는 것은 $ \mathbb{E}[R_{t}] = \sum_{x} \pi_{t}(x) q_{*}(x) $형태로 바꾸어주기 위함이다.
+
+$$
+\begin{aligned}
+\frac{\partial \mathbb{E}\left[R_{t}\right]}{\partial H_{t}(a)} &= \sum_{x} \pi_{t}(x)\left(q_{*}(x)-B_{t}\right) \frac{\partial \pi_{t}(x)}{\partial H_{t}(a)} / \pi_{t}(x) \\
+&= \mathbb{E} \left[ \left( q_{*} \left( A_{t} \right) -B_{t} \right) \frac{\partial \pi_{t} \left( A_{t} \right) }{\partial H_{t}(a)} / \pi_{t} \left( A_{t} \right) \right] \\
+&= \mathbb{E} \left[ \left( R_{t}-\bar{R}_{t} \right) \frac{\partial \pi_{t} \left( A_{t} \right) }{\partial H_{t}(a)} / \pi_{t} \left( A_{t} \right) \right]
+\end{aligned}
+$$
+
+여기서 baseline $B_{t}$는 time step $t$에서의 평균보상 $\bar{R}$로 설정되었다. 그리고 $\mathbb{E} \left[ R_{t} \mid A_{t} \right] = q_{*}(A_{t})$이므로 $A_{t}$의 이상적인 행동가치는 해당 행동에 대한 보상의 기댓값이라는 점에서 위와 같이 쓸 수 있다.
+
+이제 편미분항을 정리해보자. Quotient rule을 사용해 편미분항은 아래와 같이 바꾸어 쓸 수 있다.
+
+$$
+\begin{aligned}
+\frac{\partial \pi_{t}(x)}{\partial H_{t}(a)} &=\frac{\partial}{\partial H_{t}(a)} \pi_{t}(x) \\
+&=\frac{\partial}{\partial H_{t}(a)} \left[ \frac{e^{H_{t} (x)}}{\sum_{y=1}^{k} e^{H_{t} (y)}} \right] \\
+&=\frac{\frac{\partial e^{H_{t} (x)}}{\partial H_{t}(a)} \sum_{y=1}^{k} e^{H_{t} (y)}-e^{H_{t} (x)} \frac{\partial \sum_{y=1}^{k} e^{H_{t} (y)}}{\partial H_{t}(a)}}{ \left(\sum_{y=1}^{k} e^{H_{t} (y)} \right)^{2}} \\
+&=\frac{\mathbb{1}_{a=x} e^{H_{t} (x)} \sum_{y=1}^{k} e^{H_{t} (y)}-e^{H_{t} (x)} e^{H_{t}(a)}}{ \left(\sum_{y=1}^{k} e^{H_{t} (y)} \right)^{2}} \\
+&=\frac{\mathbb{1}_{a=x} e^{H_{t} (x)}}{\sum_{y=1}^{k} e^{H_{t} (y)}}-\frac{e^{H_{t} (x)} e^{H_{t}(a)}}{ \left(\sum_{y=1}^{k} e^{H_{t} (y)} \right)^{2}} \\
+&=\mathbb{1}_{a=x} \pi_{t} (x)-\pi_{t} (x) \pi_{t}(a) \\
+&=\pi_{t} (x) \left(\mathbb{1}_{a=x}-\pi_{t}(a) \right)
+\end{aligned}
+$$
+
+이 결과를 다시 대입해주면,
+
+$$
+\begin{aligned}
+\frac{\partial \mathbb{E} [R_{t}]}{\partial H_{t}(a)} &= \mathbb{E} \left[ \left( R_{t} - \bar{R}_{t} \right) \pi_{t} \left( A_{t} \right) \left( \mathbb{1}_{a=A_{t}} - \pi_{t} (a) \right) / \pi_{t} \left( A_{t} \right) \right] \\
+&= \mathbb{E}\left[\left(R_{t}-\bar{R}_{t}\right)\left(\mathbb{1}_{a=A_{t}}-\pi_{t} (a)\right)\right]
+\end{aligned}
+$$
+
+강화학습에서는 식을 기댓값을 사용하는 형태로 나타내려고 노력하는 경우가 많다. 이는 해당 방법을 현실의 문제에 적용하기 위해서 매우 중요한 접근이다. 이유는 기댓값으로 표현이 되었다면 매 time step마다의 정보를 통해 incremental하게 접근할 수 있기 때문이다. 
+
+위 식을 한 줄로 표현한다면 다음과 같다.
+
+$$
+\begin{aligned}
+&H_{t+1}(a)=H_{t}(a)+\alpha\left(R_{t}-\bar{R}_{t}\right)\left(\mathbb{1}_{a=A_{t}}-\pi_{t}(a)\right) &\text { for all } a
+\end{aligned}
+$$
+
+$a$에 따라 나누어 포현하면 다음과 같다.
+
+$$
+\begin{aligned}
+H_{t+1}\left(A_{t}\right) & \doteq H_{t}\left(A_{t}\right)+\alpha\left(R_{t}-\bar{R}_{t}\right)\left(1-\pi_{t}\left(A_{t}\right)\right), & & \text { and } \\
+H_{t+1}(a) & \doteq H_{t}(a)-\alpha\left(R_{t}-\bar{R}_{t}\right) \pi_{t}(a), & & \text { for all } a \neq A_{t}
+\end{aligned}
+$$
+
+여기서 $ \alpha $는 step-size parameter이고 $\bar{R}_{t} \in \mathbb{R}$는 time step $t$이전까지의 평균보상이다. 따라서 위의 업데이트식은 incremental하게 적용할 수 있다. 식을 통해 time step $t$에서 선택한 action이 baseline보다 컸다면 해당 행동의 preference는 증가하고 나머지 action에 대해서는 감소할 것임을 알 수 있다. 반대로 선택한 action이 baseline보다 작았다면 해당 행동의 preference는 감소하고 나머지 행동의 preference는 증가하게 만들어준다. 위 식에서 각각 뒤에 붙는 $\left(1-\pi_{t}\left(A_{t}\right)\right)$와 $\pi_{t}(a)$는 모든 행동에 대한 preference의 총 합은 변하지 않도록 해준다는 관점에서 보면 이해가 편하다.
+
+### Performance
+
+그렇다면 gradient bandit algorithm의 성능은 어떨까? 앞서와 마찬가지로 10-armed bandit에 대한 성능을 살펴보자. 이번에는 앞의 testbed와는 다르게 10개의 bandit 각각의 실제 기댓값은 평균이 0이 아닌 4인 정규분포에서 정해진다. (분산은 1로 동일) 따라서 모든 bandit에 대한 기대보상이 상향되는 결과를 가져올 것이다. 하지만 gradient bandit은 baseline term이 몇번의 시도 뒤에 +4에 가까운 값으로 설정되어 전체적으로 향상된 reward의 영향을 받지 않고 optimal action을 더 잘 추정할 수 있다.
+
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.5.png" width=50% height=50%/>
+<figcaption>Figure2.5: Average performance of the gradient bandit algorithm with and without a reward baseline on the 10-armed test bed when the $q_{*}(a)$ are chosen to be near $+4$ rather than zero.</figcaption>
+</figure>
+
+위의 그림을 보면 우선 with baseline과 without baseline을 통해 baseline term이 있는 경우 optimal action을 훨씬 빠르게 찾는다는 것을 볼 수 있다. 그리고 step-size parameter가 클수록 더 빠르게 수렴하는 것을 볼 수있다. 동시에, step-size parameter가 더 높아진다고 해서 optimal action 비율이 더 높아짐을 보장하지 않는다는 것 또한 볼 수 있다.
 
 ## Reference
 
