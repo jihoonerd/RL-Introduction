@@ -312,6 +312,14 @@ $$
 
 위의 그림을 보면 우선 with baseline과 without baseline을 통해 baseline term이 있는 경우 optimal action을 훨씬 빠르게 찾는다는 것을 볼 수 있다. 그리고 step-size parameter가 클수록 더 빠르게 수렴하는 것을 볼 수있다. 동시에, step-size parameter가 더 높아진다고 해서 optimal action 비율이 더 높아짐을 보장하지 않는다는 것 또한 볼 수 있다.
 
+## Asssociative Search (Contextual Bandits)
+
+지금까지 다룬 bandit 문제는 모두 nonassociative task에 속한다. 그렇다면 무엇이 연관되지 않았다는 걸까? 상황에 따라 다른 행동이 연관된어 있지 않다는 것을 의미한다. Stationary와는 구분해서 생각해야한다. Nonassociative문제에서는 stationary일때, 최적인 하나의 action을 찾는 문제가 되고, nonassociative & nonstationary라면 시간이 지남에 따라 최적의 action을 잘 추적하는 방식을 찾으면 된다. 여기서 bandit의 상황은 고정이 되어 있다는 점에 유의해야한다. Bandit의 상태는 1개이다. (one-step MDP) 실제 강화학습 문제는 한번의 상황으로 끝나는 경우는 거의 없다. 강화학습이 다루는 중요한 주제가 sequential decision making이라는 점만 보아도 강화학습이 다루는 문제의 영역은 한 개 이상의 상황을 다룰 것임을 짐작할 수 있다.
+
+그렇다면 bandit문제를 어떻게 하면 associative한 문제로서 생각해볼 수 있을까? 좀 특이한 bandit을 생각해보자. $k$-armed bandit이 있기는 한데 bandit을 직접 볼 수는 없고 어떤 화면이 있어서 화면을 통해 bandit을 보게 된다. 문제는 보고 있는 bandit이 어떤 bandit인지는 모른다. 그리고 화면을 보고 어떤 bandit을 당길지를 결정해야한다고 해보자. 매 step 내가 보는 화면의 bandit이 이전 step과 같은 bandit인지 아닌지 구분할 방법이 없는 상태인 것이다. 이렇게 되면 행동가치든, preference든 추정한 값을 어디에 배정해야될지 모른다는 문제가 생긴다. 여기서 조건을 약간 느슨하게해보자. Bandit마다 다행히 모두 똑같은 화면은 아니라고 가정해보자. 예를 들어 1번 bandit 화면이 보여질때는 약간 푸르딩딩하고 4번 bandit의 화면이 보여질때는 누리끼끼한 것처럼 단서들이 주어진다고 해보자. 이러면 하나의 화면을 보고 결정하더라도 지금 보고있는 화면의 색깔에 따라 bandit을 추정해볼 수 있고 그에 맞는 정책을 취할 수 있게 된다. 화면의 색깔에 따라 다른 행동을 선택해야하는 이 상황이 associative한 상황이다. 즉, 화면의 색깔(상태)과 행동이 연관되게 된다. 이러한 문제는 시행착오를 통해 **상황에 따라** 최적의 행동을 탐색해야하는 **associative search** 문제가 되는 것이다. 문맥이 생겼다는 의미에서 **contextual bandits**라고 부르기도 한다.
+
+그렇다면 이러한 associative search task는 full reinforcement learning problem 문제라고 할 수 있을까? 그렇지는 않다. 교재에서 associative search는 full reinforcement learning과 $k$-armed bandits의 중간에 있다고 말한다. 상황에 따라 action을 최적화해야하는, 즉 policy학습 개념을 포함하기는 하지만 여전히 bandit 문제는 즉각적인 보상만 고려하면 되는 one-step MDP이기 때문이다. 행동이 보상을 주는 것뿐만 아니라 다음 상황에도 영향을 준다면, 그 때 비로소 full reinforcement learning 문제가 된다.
+
 ## Reference
 
 * [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
