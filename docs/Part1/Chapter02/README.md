@@ -50,14 +50,14 @@ $$
 
 행동가치를 추정하는 다양한 방식이 있다. 이러한 방식을 통틀어 **action-value methods** 라고 부른다. 행동가치란 해당 행동을 선택하였을 때 보상의 기댓값임을 상기하자.
 
-그렇다면 행동가치는 어떻게 계산하는지에 대해 살펴보자. 다음은 sample-average method라는 방식으로 action value를 평균으로 간단하게 구하는 방법이다. 행동을 통해 얻은 보상을 해당 행동을 시행한 횟수로 나누면 나누면 얻을 수 있다.
+그렇다면 행동가치는 어떻게 계산하는지에 대해 살펴보자. 다음은 sample-average method라는 방식으로 행동가치를 평균으로 간단하게 구하는 방법이다. 행동을 통해 얻은 보상을 해당 행동을 시행한 횟수로 나누면 나누면 얻을 수 있다.
 
 > [!NOTE]
 > **Definition: Sample-average Method**
 >
 > 행동가치를 추정하는 가장 간단한 방법으로 행동을 취했을 때 얻은 결과에 단순 평균을 취하는 방법을 생각해 볼 수 있다. 이러한 방식을 **Sample-average Method** 라고 한다.
 > $$\begin{aligned}Q_t(a) &\doteq \frac{\text{sum of rewards when } a \text{ taken prior to }t}{\text{number of times } a \text{ taken prior to }t} \\ &= \frac{\sum_{i=1}^{t-1}  R_i \cdot \mathbb{1}_{A_i=a}}{\sum_{i=1}^{t-1} \mathbb{1}_{A_i=a}} \end{aligned}$$
-> 위 식에서 $\mathbb{1}_{\text{predicate}}$은 predicate이 True일 때 1, 아닐 때 0인 random variable이다. 만약 분모가 0이라면 사전에 정의된 Default값을 value로 반환하며 분모가 무한히 커지면, 즉 time step $t$에서의 Action이 무한히 커지면 큰 수의 법칙(The law of large numbers)에 의해 $Q_t(a)$는 $q_{*}(a)$로 수렴한다.
+> 위 식에서 $\mathbb{1}_{\text{predicate}}$은 predicate이 True일 때 1, 아닐 때 0인 random variable이다. 만약 분모가 0이라면 사전에 정의된 default값을 value로 반환하며 분모가 무한히 커지면, 즉 time step $t$에서의 행동이 무한히 커지면 큰 수의 법칙(The law of large numbers)에 의해 $Q_t(a)$는 $q_{*}(a)$로 수렴한다.
 
 행동가치를 값이 있을때, greedy한 선택은 다음과 같이 표현할 수 있다.
 
@@ -148,7 +148,7 @@ $$
 
 $\alpha \in (0, 1]$이며 첫번째 줄을 보면 $\alpha$라는 가중치가 현재 보상에 적용되고 나머지 $1-\alpha$는 최근 행동가치의 가중치로 들어간 것을 볼 수 있다. 이후 전개식은 식을 바꾸어 쓴 것일 뿐이므로 가중치의 합은 1로 보존된다. 즉, $ (1-\alpha)^{n} + \sum_{i=1}^{n} \alpha(1-\alpha)^{n-i} = 1 $이다. 주목할 부분은 현재의 보상 $R_{i}$의 가중치인 $ \alpha(1-\alpha)^{n-i} $인데, 가장 최근인 $R_{n}$의 가중치는 $\alpha$이다. 반면 최초의 보상 $R_{1}$의 계수는 $\alpha (1 - \alpha)^{n-1}$이다.  시행 $i$가 커질수록 $ (1-\alpha) < 1$이므로 더 큰 가중치를 받게 된다. 매 time step이 커질수록 $1/(1-\alpha) $배만큼 큰 가중치를 받으므로 이를 **exponential recency-weighted average**라고도 한다.
 
-이 때, 아무 step-size parameter나 사용한다고 해서 action value가 수렴하지는 않는다. 수렴성을 보장하기 위해서 step-size parameter는 다음 두 조건을 만족해야 한다.
+이 때, 아무 step-size parameter나 사용한다고 해서 행동가치가 수렴하지는 않는다. 수렴성을 보장하기 위해서 step-size parameter는 다음 두 조건을 만족해야 한다.
 
 $$
 \begin{aligned}
@@ -319,6 +319,25 @@ $$
 그렇다면 bandit문제를 어떻게 하면 associative한 문제로서 생각해볼 수 있을까? 좀 특이한 bandit을 생각해보자. $k$-armed bandit이 있기는 한데 bandit을 직접 볼 수는 없고 어떤 화면이 있어서 화면을 통해 bandit을 보게 된다. 문제는 보고 있는 bandit이 어떤 bandit인지는 모른다. 그리고 화면을 보고 어떤 bandit을 당길지를 결정해야한다고 해보자. 매 step 내가 보는 화면의 bandit이 이전 step과 같은 bandit인지 아닌지 구분할 방법이 없는 상태인 것이다. 이렇게 되면 행동가치든, preference든 추정한 값을 어디에 배정해야될지 모른다는 문제가 생긴다. 여기서 조건을 약간 느슨하게해보자. Bandit마다 다행히 모두 똑같은 화면은 아니라고 가정해보자. 예를 들어 1번 bandit 화면이 보여질때는 약간 푸르딩딩하고 4번 bandit의 화면이 보여질때는 누리끼끼한 것처럼 단서들이 주어진다고 해보자. 이러면 하나의 화면을 보고 결정하더라도 지금 보고있는 화면의 색깔에 따라 bandit을 추정해볼 수 있고 그에 맞는 정책을 취할 수 있게 된다. 화면의 색깔에 따라 다른 행동을 선택해야하는 이 상황이 associative한 상황이다. 즉, 화면의 색깔(상태)과 행동이 연관되게 된다. 이러한 문제는 시행착오를 통해 **상황에 따라** 최적의 행동을 탐색해야하는 **associative search** 문제가 되는 것이다. 문맥이 생겼다는 의미에서 **contextual bandits**라고 부르기도 한다.
 
 그렇다면 이러한 associative search task는 full reinforcement learning problem 문제라고 할 수 있을까? 그렇지는 않다. 교재에서 associative search는 full reinforcement learning과 $k$-armed bandits의 중간에 있다고 말한다. 상황에 따라 action을 최적화해야하는, 즉 policy학습 개념을 포함하기는 하지만 여전히 bandit 문제는 즉각적인 보상만 고려하면 되는 one-step MDP이기 때문이다. 행동이 보상을 주는 것뿐만 아니라 다음 상황에도 영향을 준다면, 그 때 비로소 full reinforcement learning 문제가 된다.
+
+## Summary
+
+이번 문서에서는 bandit문제를 바탕으로 강화학습의 기본적인 개념인 exploration-exploitation balancing과 이에 대한 기법인 $\varepsilon$-greedy 방법을 보았다. 또한 성능향상을 위한 trick으로 optimistic inital value나 UCB와 같은 방법을 알아보았으며 마지막으로 행동가치가 아닌 preference를 추정하는 gradient bandit algorithm과 associative 문제의 정의를 보았다. 
+
+문제에 따라 다르겠지만 교재에서는 그렇다면 10-armbed bandit testbed에 대해서 어떤 방법이 가장 효과적이었는지를 비교해준다. 아래의 그래프는 이번 장에서 다룬 방법들에 대해 parameter변화에 따른 평균보상을 보여준다. 이와 같은 그래프를 **parameter study**라고 한다.
+
+<figure align=center>
+<img src="assets/images/Chapter02/Fig_2.6.png" width=50% height=50%/>
+<figcaption>Figure2.6: A parameter study of the various bandit algorithms presented in this chapter. Each point is the average reward obtained over 1000 steps with a particular algorithm at a particular setting of its parameter.</figcaption>
+</figure>
+
+10-armed testbed에서는 UCB가 전반적으로 가장 잘 작동하는 양상을 보인다. 교재에서는 이번 장에서 다룬 알고리즘들은 매우 단순하지만 그만큼 가정과 복잡성이 단순해 SOTA로 충분히 가치가 있다고 말한다. 이후에 더 복잡한 방식들을 다루게 되겠지만 그런 방법들은 더 강한 가정을 필요로하며 이로 인해 full reinforcement learning에 적용하기 어렵다는 한계 또한 존재한다. 이후 full reinforcement learning 문제를 푸는 방법에서도 이번 문서에서 다룬 기법들을 부분적으로 사용하게 된다. 
+
+$k$-armed bandit 문제에서 exploration exploitation balancing을 다루는 방법 중 하나로 행동가치의 특수한 형태인 Gittins index를 활용할 수도 있다. 일반적으로는 가능하지 않지만 문제의 prior 분포에 대해 완전한 정보(complete knowledge)가 있을 경우에 Gittins index를 사용하면 tractable하며 optimal solution을 직접적으로 구할 수 있게된다. 하지만 full reinforcement learning 문제로 확장이 어렵다는 문제가 있다.
+
+Gittins index 자체는 Bayesian 방법의 하나로, 행동가치에 대한 초기 분포와 이른 매 step마다 update하는 방법을 사용한다. 일반적으로 이 과정은 연산하기가 매우 까다로우나 conjugate prior를 사용하는 경우에 한해서는 효율적인 update가 가능하다. 일단, 이렇게 행동가치에 대한 posterior분포가 계산되면 행동의 posterior 분포에서 각각 sampling을 하고 그 중 가장 큰 값을 사용한 결과로 update한다. 이러한 방식을 **posterior sampling** 또는 **Thomson sampling**이라고 한다.
+
+Bayesian setting을 사용하면 행동가치 뿐만이 아니라 exploration과 exploitation의 optimal balance를 계산하는 것도 생각해 볼 수 있다. 가능한 행동 각각에 대해서 즉각적인 보상과 행동가치에 대한 posterior 분포를 계산할 수 있으며 이 과정에서 update되는 posterior분포는 문제에 대한 information state가 된다. 예를 들어 1000개의 sequnetial decision making 문제가 있을 때, 각 step에 대해서 모든 행동, 보상을 계산할 수 있을 것이다. 그림으로 그려보면 매우 큰 tree를 그려가는 것으로 비유할 수 있다. 가정을 추가하면, 보상과 각 사건에 이르는 확률까지도 계산할 수 있게 된다. 하지만 다시 생각해보면, 이렇게 큰 tree를 완성하는 것이 가능할까? 이렇게 가능한 모든 경우를 고려할 때, tree는 매우 빠르게 커지게 된다. 1000개의 step이 각 step에서 두 개의 행동과 두 개의 보상값만 가진다 하더라도 tree는 $2^{2000}$개의 leaf를 갖는다. 결론적으로 모든 경우에 대해서 일일히 계산하는 접근은 현실적으로 불가능하다. 이에 대한 대안은 효율적으로 근사를 시켜보는 것이다. 이러한 근사를 도입하게 되면 bandit 문제는 full reinforcement learning 문제로 바뀌게 되며, Part 2에서 소개되는 approximated reinforcement learning 방법을 사용할 수 있게 된다.
 
 ## Reference
 
