@@ -2,4 +2,5 @@
 * [Chapter 1](/Chapter01/README.md)
 * [Part 1](/Part1/README.md)
   * [Chapter 2](/Part1/Chapter02/README.md)
+  * [Chapter 3](/Part1/Chapter03/README.md)
 * [Glossary](/_glossary.md)
