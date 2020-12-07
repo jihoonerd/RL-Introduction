@@ -1,3 +1,0 @@
-- Translations
-  - [:kr: Korean](/)
-  - [:uk: English](/en/)
