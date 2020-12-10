@@ -23,9 +23,9 @@ $$S_{0}, A_{0}, R_{1}, S_{1}, A_{1}, R_{2}, S_{2}, A_{2}, R_{2}, \ldots$$
 
 여기서는 **finite** MDP만을 다룬다. 즉, MDP에서 가질 수 있는 상태, 행동으 그리고 보상의 수는 모두 유한하다. Finite MDP를 가정하면 이전 상태와 행동으로부터 현재의 보상과 상태에 대한 이산확률분포를 갖게된다. 즉 다음을 정의할 수 있게 된다.
 
-$$
-p\left(s^{\prime}, r \mid s, a\right) \doteq \operatorname{Pr}\left\{S_{t}=s^{\prime}, R_{t}=r \mid S_{t-1}=s, A_{t-1}=a\right\}
-$$
+> [!NOTE]
+> **Four-argument Dyanmics Function**
+> $$p\left(s^{\prime}, r \mid s, a\right) \doteq \operatorname{Pr}\left\{S_{t}=s^{\prime}, R_{t}=r \mid S_{t-1}=s, A_{t-1}=a\right\}$$
 
 눈여겨볼점은 이렇게 정의된 함수 $p$이다. $p$는 MDP가 어떻게 작동하는지를 결정하게 된다. MDP가 작동하는 방식에 대해 포괄적으로 dynamics라고 하며, 따라서 $p$가 MDP의 dynamics를 정의한다고 표현할 수 있다. 위 식에도 definition 기호인 $\doteq$를 사용하고 있다. $p$는 네개의 인자를 갖는 함수로 $p: \mathcal{S} \times \mathcal{R} \times \mathcal{S} \times \mathcal{A} \rightarrow [0, 1]$이다. 식에 있는 $\mid$ 기호는 조건부확률처럼 자연스럽게 해석할 수 있다. 강화학습의 dyanmics식에서 $\mid$는 $\mid$ 뒤의 "상태와 행동을 선택했을 때"를 의미한다.
 
@@ -33,3 +33,52 @@ $$
 \sum_{s^{\prime} \in \mathcal{S}} \sum_{r \in \mathcal{R}} p\left(s^{\prime}, r \mid s, a\right)=1, \text { for all } s \in \mathcal{S}, a \in \mathcal{A}(s)
 $$
 
+> [!NOTE]
+>
+> MDP에서 환경의 dynamics는 $p$에 의해 결정된다.
+
+이를 좀 더 자세히 알아보자. MDP는 다음과 같은 정보를 사용한다.
+
+$$MDP \coloneqq (\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma)$$
+
+이후에 반복해서 언급하겠지만 이쯤에서 MDP를 **안다**라는 의미에 대해 생각해보자. 결론부터 이야기하면 MDP를 안다는 것은 위의 모든 인자들을 안다는 것이다. 상태와 행동은 agent입장에서 관측하고 결정하는 행동이므로 agent가 알 수 있다. 그렇다면 전이확률과 보상함수는 어떨까? 현재 상태에서 특정 상태로 갈 확률 그리고 현재 상태에서 특정 행동을 했을 때의 보상은 agent가 아닌 **환경이 결정하는 영역**이다. 문제의 성질에 따라 agent가 환경에 대한 정보를 알 수도 모를수도 있게 되는데 환경에 대한 정보, 즉 환경에 대한 모델을 알고 있다면 model-based가 되는 것이고 환경에 대한 모델을 모른다면 model-free가 되는 것이다. 정리하면 model-based의 경우 MDP에 대해 완전히(complete) 알고 있을 때 가능한 방식이다. 세부적인 내용은 이후에도 반복되므로 여기서는 MDP를 안다는 것은 위의 모든 인자들을 안다는 것을 의미한다 정도로 이해하는 것으로 충분하다.
+
+그리고 MDP에서 중요한 것이 **Markov property**이다. 내용은 간단하다. 어떠한 상태가 과거의 모든 agent-environment interaction을 갖고 있다면 이는 Markov property를 만족한다고 한다. 다음상태, 즉 미래는 현재상태에만 의존하지 다음상태를 결정하는 함수는 현재상태이외의 과거상태에 의존하지 않는다는 의미이다. MDP는 기본적으로 Markov property를 만족한다.
+
+> [!WARNING]
+>
+> Markov property에서 자주 발생하는 오해가 바로 상태와 시점의 구분이다. 꼭 현재 상태가 하나의 시점으로 구성될 필요는 없다. 대표적으로 Atari게임으로 유명한 DQN의 경우 이전 4개의 프레임을 하나의 상태로 구성하였다. 따라서 시점과 상태를 동일하게 생각하지 않도록 주의하자.
+
+위의 Four-argument Dyanimcs Function에서 보상에 대해 summation하면 다음의 state-transition probabilities $p: \mathcal{S} \times \mathcal{S} \times \mathcal{A} \rightarrow [0, 1]$를 얻을 수 있다.
+
+$$
+p\left(s^{\prime} \mid s, a\right) \doteq \operatorname{Pr}\left\{S_{t}=s^{\prime} \mid S_{t-1}=s, A_{t-1}=a\right\}=\sum_{r \in \mathcal{R}} p\left(s^{\prime}, r \mid s, a\right)
+$$
+
+State-action pair로 표현되는 two-argument 보상함수 $r: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
+
+$$
+r(s, a) \doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a\right]=\sum_{r \in \mathcal{R}} r \sum_{s^{\prime} \in \mathcal{S}} p\left(s^{\prime}, r \mid s, a\right)
+$$
+
+State-action-next-state triples로 표현되는 three-argument 보상함수 $r: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
+
+$$
+r\left(s, a, s^{\prime}\right) \doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a, S_{t}=s^{\prime}\right]=\sum_{r \in \mathcal{R}} r \frac{p\left(s^{\prime}, r \mid s, a\right)}{p\left(s^{\prime} \mid s, a\right)}
+$$
+
+대부분의 경우 Four-argument Dyanimcs Function으로 표현하기도하고 나머지는 쉽게 유도가 가능하므로 Four-argument Dyanimcs Function정도는 암기하는 것이 좋다.
+
+MDP는 순차적 의사결정 문제에 대해 유연하게 적용할 수 있다. 책의 다음 문장이 이를 깔끔하게 설명한다.
+
+> In general, actions can be any decisions we want to learn how to make, and the states can be anything we can know that might be useful in making them.
+
+학습하기를 바라는 결정과정은 무엇이든 행동으로 취급할 수 있으며 그러한 행동을 위해 필요한 유용한 정보는 무엇이든 상태로 취급할 수 있다. 또한 agent와 환경의 구분이 꼭 물리적인 내부와 외부로 나누어지는 것은 아니므로 혼동될 수 있는데, 일반적으로 다음의 기준을 사용하면 구분이 용이하다.
+
+> [!NOTE]
+> 
+> Agent가 마음대로 변경할 수 없는 것들은 환경의 일부로 간주한다.
+
+MDP는 상호작용이 있는 목표지향적(goal-directed) 학습문제에 대한 framework를 제공한다는 의의가 있다. Agent와 환경이 상호작용하며 목적을 달성해야 하는 상황을 상태와 행동, 전이확률과 보상함수에서의 신호교환이라는 형태로 추상화하는 도구를 제공해 이후에 다룰 다양한 도구들을 사용할 수 있는 토대를 마련해준다.
+
+## Goals and Rewards

@@ -17,11 +17,17 @@ Machine learning
 ##### 보상
 Reward
 
+##### 보상함수
+Reward Function
+
 ##### 상태
 State
 
 ##### 상태공간
 State space
+
+##### 전이확률행렬
+Transition Probability Matrix
 
 ##### 정책
 Policy
@@ -37,6 +43,9 @@ Optimization
 
 ##### 행동
 Action
+
+##### 행동공간
+Action Space
 
 ##### 행동가치
 Action value
