@@ -52,19 +52,25 @@ $$MDP \coloneqq (\mathcal{S}, \mathcal{A}, \mathcal{P}, \mathcal{R}, \gamma)$$
 위의 Four-argument Dyanimcs Function에서 보상에 대해 summation하면 다음의 state-transition probabilities $p: \mathcal{S} \times \mathcal{S} \times \mathcal{A} \rightarrow [0, 1]$를 얻을 수 있다.
 
 $$
-p\left(s^{\prime} \mid s, a\right) \doteq \operatorname{Pr}\left\{S_{t}=s^{\prime} \mid S_{t-1}=s, A_{t-1}=a\right\}=\sum_{r \in \mathcal{R}} p\left(s^{\prime}, r \mid s, a\right)
+\begin{aligned}
+p\left(s^{\prime} \mid s, a\right) &\doteq \operatorname{Pr}\left\{S_{t}=s^{\prime} \mid S_{t-1}=s, A_{t-1}=a\right\} \\ &= \sum_{r \in \mathcal{R}} p\left(s^{\prime}, r \mid s, a\right)
+\end{aligned}
 $$
 
 State-action pair로 표현되는 two-argument 보상함수 $r: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
 
 $$
-r(s, a) \doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a\right]=\sum_{r \in \mathcal{R}} r \sum_{s^{\prime} \in \mathcal{S}} p\left(s^{\prime}, r \mid s, a\right)
+\begin{aligned}
+r(s, a) &\doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a\right] \\ &= \sum_{r \in \mathcal{R}} r \sum_{s^{\prime} \in \mathcal{S}} p\left(s^{\prime}, r \mid s, a\right)
+\end{aligned}
 $$
 
 State-action-next-state triples로 표현되는 three-argument 보상함수 $r: \mathcal{S} \times \mathcal{A} \times \mathcal{S} \rightarrow \mathbb{R}$는 다음과 같이 정의된다.
 
 $$
-r\left(s, a, s^{\prime}\right) \doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a, S_{t}=s^{\prime}\right]=\sum_{r \in \mathcal{R}} r \frac{p\left(s^{\prime}, r \mid s, a\right)}{p\left(s^{\prime} \mid s, a\right)}
+\begin{aligned}
+r\left(s, a, s^{\prime}\right) &\doteq \mathbb{E}\left[R_{t} \mid S_{t-1}=s, A_{t-1}=a, S_{t}=s^{\prime}\right]\\ &= \sum_{r \in \mathcal{R}} r \frac{p\left(s^{\prime}, r \mid s, a\right)}{p\left(s^{\prime} \mid s, a\right)}
+\end{aligned}
 $$
 
 대부분의 경우 Four-argument Dyanimcs Function으로 표현하기도하고 나머지는 쉽게 유도가 가능하므로 Four-argument Dyanimcs Function정도는 암기하는 것이 좋다.
@@ -82,3 +88,25 @@ MDP는 순차적 의사결정 문제에 대해 유연하게 적용할 수 있다
 MDP는 상호작용이 있는 목표지향적(goal-directed) 학습문제에 대한 framework를 제공한다는 의의가 있다. Agent와 환경이 상호작용하며 목적을 달성해야 하는 상황을 상태와 행동, 전이확률과 보상함수에서의 신호교환이라는 형태로 추상화하는 도구를 제공해 이후에 다룰 다양한 도구들을 사용할 수 있는 토대를 마련해준다.
 
 ## Goals and Rewards
+
+강화학습의 목표는 간단하다. Agent가 누적보상을 최대로 받게 하는 것이다. 강화학습에서의 보상은 하나의 숫자이다. 각각의 시점에서의 보상은 스칼라값 $R_t \in \mathbb{R}$로 표현할 수 있다. 그런데 복잡한 작업에 대해서도 고작 하나의 스칼라 값인 보상을 사용할 수 있을까? 더 복합적인 정보를 표현할 수 있도록, 예를 들어 "보상의 집합으로 구성해야 하지 않을까?"라는 생각을 해볼 수 있다. 결론은 그렇게 해야한다는 것이다. 보상신호가 복잡해지게 되면 학습과정은 훨씬 어려워지게 된다. 따라서 강화학습은 **reward hypothesis**라는 가정을 전제로 한다.
+
+> [!NOTE]
+> **Reward Hypothesis**
+> 
+> 강화학습에서 달성하고자 하는 목표는 누적보상의 기댓값을 최대화하는 문제로 치환할 수 있다.
+
+굉장히 당연한 이야기지만 동시에 중요한 가정이다. 강화학습은 MDP를 사용해 표현하고 MDP에서 학습방향은 보상에 의해 정의가 된다. 따라서 누적보상의 기댓값을 최대화하는 방향이 우리가 풀고자하는 문제의 방향을 나타내어야 원하는 결과를 얻을 수 있다. Reward hypothesis는 이러한 기본전제를 명시적으로 표현해준다.
+
+또한 보상설정에서 매우 중요한 부분은 보상은 달성하고자 하는 목적 그 자체가 되어야지 달성하는 방법에 관한 것이 되어서는 안된다.
+
+> The reward signal is your way of communicating to the robot *what* you want it to achieve, not *how* you want it achieved.
+
+실제로 강화학습 문제에서 보상설계는 그 자체로 매우 어렵고 중요한 부분이다. 관련해서, 자주 하게 되는 실수 중 하나가 보상을 사전지식(prior knowledge)을 넣기 위한 수단으로 사용하는 것이다. 교재의 예처럼 보상은 이길 때 주어지는 어떤 양수값이 되어야지, 퀸이라는 말을 잡는 것이 보상이 되어서는 안된다. 만약 이렇게 설계한다면 게임을 지더라도 퀸을 잡는 원치 않은 결과를 얻게 될 수 있다. 따라서 보상은 원하는 목적 그 자체를 표현해야지 어떤 문제의 subgoal을 달성하도록 설정되어서는 안된다.
+
+물론, 보상을 통해서 사전지식을 넣는게 잘못된 것이지 사전지식을 주입하는 자체가 틀린 것은 아니다. 실제로, AlphaGo는 프로기사들의 대국을 사전정보로 사용하였다. 단계적으로 목적을 달성하도록 하는 curriculum learning이라는 방법도 있다. 다만, 두 방식 모두 보상으로 사전지식을 주입하지는 않는다.
+
+## Reference
+
+* [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
+* [Sutton, R. S., Barto, A. G. (2018). Reinforcement learning: An introduction. Cambridge, MA: The MIT Press.](http://www.incompleteideas.net/book/the-book-2nd.html)
