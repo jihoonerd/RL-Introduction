@@ -14,6 +14,9 @@ Ovservation
 ##### 기계학습
 Machine learning
 
+##### 무한급수
+Infinite Series
+
 ##### 보상
 Reward
 
