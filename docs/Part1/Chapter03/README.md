@@ -152,6 +152,29 @@ $$
 G_{t}=\sum_{k=0}^{\infty} \gamma^{k}=\frac{1}{1-\gamma}
 $$
 
+## Unified Notation for Episodic and Continuing Tasks
+
+앞에서 강화학습의 task를 분류하는 다양한 방법 중 episodic task와 continuing task로 구분하는 방법을 알아보았다. 이제 앞으로 다룰 강화학습 내용을 일관성있게 전개하기 위해 두 가지 경우 모두에 대해 사용할 수 있는 return의 표기법을 정의해보자.
+
+강화학습은 표기법에 있어서 다양한 상황을 반영해야하므로 이것저것 많이 붙게되는데 논문을 읽을 때 이러한 convention에 익숙하지 않으면 무슨소리인가 싶을 때가 많아지므로 표기법 자체도 유의해서 살펴보아야 한다. 예를 들어, 지금까지 상태는 $S_{t}$로 표현해왔다. 하지만 time step $t$는 다양한 episode에서 존재할 수 있으므로 엄밀하게 $i$번 째 episode의 time step $t$를 지칭한다면 $S_{t, i}$와 같이 표기해야한다. 하지만 다행(?)스럽게도 대부분의 경우 문맥상 하나의 episode내에서 이야기를 하기 때문에 episode를 직접 표기하는 일은 거의 없다. 따라서 앞으로도 특정 episode의 time step $t$는 편의상 $S_{t}$로 표기한다. 강화학습에서는 엄밀하게 super/sub script를 모두 쓰면 붙는게 너무 많아서 이런 식의 편의상 생략이 자주 일어나는 편이다.
+
+다음으로 episodic task와 continuing task를 구분하지 않고 하나의 표기법을 사용하기 위해서는 두 task를 하나의 task로 표현하는 것이 먼저이다. 특성상 무한히 진행될 수 있는 continuing task를 episodic task의 형태로 바꾸는 것은 불가능하다. 하지만 다음과 같이 바라보면 반대는 가능하다.
+
+<figure align=center>
+<img src="assets/images/Chapter03/unified_episodic_and_continuing.png"/>
+<figcaption>Unified representation of episodic and continuing task</figcaption>
+</figure>
+
+Episodic task에 대해서 위의 회색 박스로 표현된 **absorbing state**라는 특수한 상태를 사용해 continuing task처럼 처리할 수 있다. Absorbing state는 0의 보상을 반환하면서 자기 자신의 상태로 돌아오는 상태이다. 이러한 성질은 discounting이 있는 상황에서도 그대로 사용할 수 있다는 이점을 갖는다.
+
+따라서 이제 두 가지 task 모두에 적용할 수 있는 return을 다음과 같이 쓸 수 있다.
+
+$$G_{t} \doteq \sum_{k=t+1}^{T} \gamma^{k-t-1} R_{k}$$
+
+이 때, $T=\infty$이거나 $\gamma=1$일 수 있으나 둘 다여서는 안된다.
+
+이제 문서 전반에 걸쳐서 위 형태의 return식을 사용한다.
+
 ## Reference
 
 * [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
