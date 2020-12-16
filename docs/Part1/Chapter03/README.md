@@ -175,6 +175,36 @@ $$G_{t} \doteq \sum_{k=t+1}^{T} \gamma^{k-t-1} R_{k}$$
 
 이제 문서 전반에 걸쳐서 위 형태의 return식을 사용한다.
 
+## Policies and Value Functions
+
+강화학습의 목표는 최적정책(optimal policy) 또는 최적가치함수(optimal value function)을 찾는 것이다. 강화학습에서 핵심개념인 정책과 가치함수에 대해 다루어보자. 이 둘은 강화학습을 공부하는데 있어서 가장 중요한 개념들로 교재공부할 때 필요한 것은 물론, 정확히 알아야 강화학습 알고리즘과 관련된 논문을 읽을 수 있다.
+
+> [!NOTE]
+> **Definition: Policy**
+> 
+> 정책(policy)는 상태에서 행동으로의 함수이다. 주어진 상태 $s \in \mathcal{S}$에 대한 행동 $a \in \mathcal{A}(s)$의 확률분포가 정책이다. 정책은 주로 $\pi$로 표기하며 agent가 정책 $\pi$를 따를 때 time step $t$에서의 상태 $S_t = s$에 따라 행동 $A_t = a$를 결정하는 확률을 $\pi(a \mid s)$로 표기한다.
+
+> [!NOTE]
+> **Definition: Value Fucntion**
+> 
+> 가치함수(value function)는 크게 상태가치(state-value function)와 행동가치(action-value fucntion)로 나눌 수 있다.
+>
+> **상태가치함수(state-value function)**
+> 
+> 정책 $\pi$를 따르는 상황에서의 상태가치는 $v_{\pi}(s)$로 표기하며 $\pi$를 따를 때 상태 $s$에서 시작할 경우의 exepcted return을 의미한다. 수식으로는 다음과 같이 정의한다.
+> $$
+v_{\pi}(s) \doteq \mathbb{E}_{\pi}\left[G_{t} \mid S_{t}=s\right]=\mathbb{E}_{\pi}\left[\sum_{k=0}^{\infty} \gamma^{k} R_{t+k+1} \mid S_{t}=s\right], \text { for all } s \in \mathcal{S}
+$$
+> 마지막 상태에서는 MDP가 끝나고 보상이 0이 되므로 마지막 상태에서의 value function값은 0이라는 점을 상기하자.
+>
+> **행동가치함수(action-value function)**
+> 
+> 같은방식으로 행동가치함수를 정의할 수 있다. 정책 $\pi$를 따르는 상황에서 행동가치는 $q_{\pi}(s, a)$로 표기하며 $\pi$를 따를 때 상태 $s$에서 행동 $a$를 취할 때의 expected return이다. 수식으로는 다음과 같이 정의한다.
+> $$
+q_{\pi}(s, a) \doteq \mathbb{E}_{\pi}\left[G_{t} \mid S_{t}=s, A_{t}=a\right]=\mathbb{E}_{\pi}\left[\sum_{k=0}^{\infty} \gamma^{k} R_{t+k+1} \mid S_{t}=s, A_{t}=a\right]
+$$
+
+
 ## Reference
 
 * [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
