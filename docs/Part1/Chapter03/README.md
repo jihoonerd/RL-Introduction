@@ -204,6 +204,9 @@ $$
 q_{\pi}(s, a) \doteq \mathbb{E}_{\pi}\left[G_{t} \mid S_{t}=s, A_{t}=a\right]=\mathbb{E}_{\pi}\left[\sum_{k=0}^{\infty} \gamma^{k} R_{t+k+1} \mid S_{t}=s, A_{t}=a\right]
 $$
 
+가치함수이 $v_{\pi}$와 $q_{\pi}$는 정책 $\pi$를 따르는 trajectory를 통해 경험으로 학습할 수 있다. 앞으로도 여러차례 강조될 내용이지만 강화학습에서 기대값 연산자는 매우 중요한 역할을 담당한다 위의 상태가치나 행동가치도 기대값으로 표현되어있는데 이는 기대값 연산자 안의 항 각각은 정학한 estimate이 되지는 않지만 이들의 평균은 unbiased estimate이 된다는 것을 의미한다. 다시 말해, sample기반 방법을 사용할 수 있게 해주는 중요한 연산자이다.
+
+이렇게 실제 관측한 sampling된 결과들을 평균을 내서 추정하는 과정을 **Monte Carlo methods**라고 한다. Monte Carlo methods는 5장에서 다루게 된다. 여기서 MDP가 작다면 표의 형태로 작성해 각 상태에서 받은 return을 기록해 Monte Carlo를 적용할 수 있겠지만 MDP가 크다면 불가능하다. 상태도, 행동도 많다면 특정 상태에서 특정행동을 하는 것 자체가 매우 희소하므로 이론적으로 가능하더라도 현실적으로 불가능한 경우가 많다. 따라서 MDP가 클 때는 $v_{\pi}$나 $q_{\pi}$를 parameterized function으로 잡고 이 함수를 학습시키는 방법을 사용하게 되는 것이다. Parameterized function으로 neural network를 사용한 것이 Deep RL이다. 이 parameterized function을 function approximator라고도 부른다. 책의 Part I은 tabular method로 지금 말한 경우 중 MDP가 작은 경우이다. 따라서 표에 기록하면서 필요한 값들을 추적할 수 있다. MDP가 커져서 이런 방법이 불가능한 경우가 책의 Part II에서 다루는 내용이다.
 
 ## Reference
 
