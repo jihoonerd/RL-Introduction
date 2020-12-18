@@ -208,6 +208,57 @@ $$
 
 이렇게 실제 관측한 sampling된 결과들을 평균을 내서 추정하는 과정을 **Monte Carlo methods**라고 한다. Monte Carlo methods는 5장에서 다루게 된다. 여기서 MDP가 작다면 표의 형태로 작성해 각 상태에서 받은 return을 기록해 Monte Carlo를 적용할 수 있겠지만 MDP가 크다면 불가능하다. 상태도, 행동도 많다면 특정 상태에서 특정행동을 하는 것 자체가 매우 희소하므로 이론적으로 가능하더라도 현실적으로 불가능한 경우가 많다. 따라서 MDP가 클 때는 $v_{\pi}$나 $q_{\pi}$를 parameterized function으로 잡고 이 함수를 학습시키는 방법을 사용하게 되는 것이다. Parameterized function으로 neural network를 사용한 것이 Deep RL이다. 이 parameterized function을 function approximator라고도 부른다. 책의 Part I은 tabular method로 지금 말한 경우 중 MDP가 작은 경우이다. 따라서 표에 기록하면서 필요한 값들을 추적할 수 있다. MDP가 커져서 이런 방법이 불가능한 경우가 책의 Part II에서 다루는 내용이다.
 
+가치함수의 중요한 특징 중 하나는 recursive하게 표현이 된다는 것이다. 그리고 이는 dynamic programming, 즉 문제를 작은 문제들로 나누어 푼다는 측면에서 매우 유용한 성질이다. 가치함수는 여러가지의 표현형을 갖는데, 특히 Bellman equation으로 표현되는 표현형은 모두 외워두면 이후 과정을 이해하는데 매우 편리하다.
+
+> [!NOTE]
+> **Bellman Equation for $\boldsymbol{v}_{\pi}$**
+>
+> $$
+\begin{aligned}
+v_{\pi}(s) & \doteq \mathbb{E}_{\pi}\left[G_{t} \mid S_{t}=s\right] \\
+&=\mathbb{E}_{\pi}\left[R_{t+1}+\gamma G_{t+1} \mid S_{t}=s\right] \\
+&=\sum_{a} \pi(a \mid s) \sum_{s^{\prime}} \sum_{r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma \mathbb{E}_{\pi}\left[G_{t+1} \mid S_{t+1}=s^{\prime}\right]\right] \\
+&=\sum_{a} \pi(a \mid s) \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right], \quad \text { for all } s \in \mathcal{S}
+\end{aligned}
+$$
+
+첫 번째 줄은 그 자체로 상태가치의 정의이다. 그리고 return의 recursive형태로 바꾸어 준 것이 두번째 줄이다. 그 다음부터는 기대값을 전개하는데 가중평균으로 보면 된다. 두번째에서 세번째줄로 가는 과정은 다음을 순차적으로 대입하면 쉽게 이해가 된다.
+
+$$
+\begin{aligned}
+v_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi (a \mid s) q_{\pi}(s, a)\\
+q_{\pi}(s, a) &= r_{s}^{a} + \gamma \sum_{s^{\prime} \in \mathcal{S}}p(s^{\prime}, r \mid s, a) v_{\pi}(s^{\prime})
+\end{aligned}
+$$
+
+Bellman equation과 관련된 표현형은 뒤에서 정리하도록 한다. 마지막 식을 보면서 MDP에 대한 정보를 알아야만 사용할 수 있음을 볼 수 있다. 보상과 확률전이행렬에 대한 정보를 필요로 하는데 이 정보는 MDP, 즉 환경에 대한 정보로 이를 알 수 있으면 사용할 수 있고 만약 모른다면 MDP에 대한 정보 없이 사용할 수 있는 $\mathbb{E}_{\pi}\left[R_{t+1}+\gamma G_{t+1} \mid S_{t}=s\right]$를 사용하면 된다.
+
+<figure align=center>
+<img src="assets/images/Chapter03/backup_diagram_for_state_value.png" width=30% height=30%/>
+<figcaption>Backup diagram for $v_{\pi}$</figcaption>
+</figure>
+
+위의 그램은 backup diagram인데 강화학습에서 상태와 $s-a-s^{\prime}$으로의 과정을 이해할 때 도움이 많이 된다. 흰 원은 상태, 검은 원은 state-action pair이다. 여기서 중요한 것은 현재 상태 $s$와 다음 상태 $s^{\prime}$ 사이에는 두 개의 확률과정이 있다는 것이다. 첫 번째는 정책에 의한 확률로 $s$는 정책 $\pi$가 정의하는 확률 $\pi(a \mid s)$에 따라 $a$를 선택한다. 그리고 해당 행동 $a$를 실행하면 그 다음에는 환경이 갖고 있는 확률에 의해 다음 상태인 $s^{\prime}$이 보상과 함께 결정된다. 위의 Bellman euqation은 backup diagram에 보이는 과정들을 확률에 대한 가중평균을 했다고 이해하면 훨씬 이해하기도, 암기하기도 쉽다.
+
+가치함수 $v_{\pi}$는 Bellman equation의 유일한 해이며 이는 이후에 $v_{\pi}$를 계산하고 근사하고 학습하는 과정에서 자세히 다루게 된다.
+
+### Bellman Expectation Equation
+
+> [!NOTE]
+> **Bellman Expectation Equation**
+> $$
+\begin{aligned}
+v_{\pi} (s_t) &= \mathbb{E}_{\pi} [r_{t+1} + \gamma v_{\pi} (s_{t+1})]\\
+q_{\pi} (s_t, a_t) &= \mathbb{E}_{\pi} [r_{t+1} + \gamma q_{\pi}(s_{t+1}, a_{t+1})]\\\\
+v_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi(a \mid s) q_{\pi}(s, a)\\
+q_{\pi}(s,a) &= r_s^a + \gamma \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} v_{\pi}(s^{\prime})\\\\
+v_{\pi}(s) &= \sum_{a \in \mathcal{A}} \pi (a \mid s) \left(r_{s}^{a} + \gamma \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} v_{\pi} (s^{\prime}) \right)\\
+q_{\pi}(s, a) &= r_{s}^{a} + \gamma \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} \sum_{a^{\prime} \in \mathcal{A}} \pi (a^{\prime} \mid s^{\prime}) q_{\pi}(s^{\prime}, a^{\prime})
+\end{aligned}
+$$
+
+Bellman Expectation Equation은 강화학습분야에서 전반적으로 사용되는 핵심 개념으로 모두 이해하고 암기하자. 앞서 다룬 내용을 이해하였다면 식을 외우는 것은 그리 어렵지 않다.
+
 ## Reference
 
 * [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
