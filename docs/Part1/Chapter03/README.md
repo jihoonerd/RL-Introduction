@@ -259,6 +259,34 @@ $$
 
 Bellman Expectation Equation은 강화학습분야에서 전반적으로 사용되는 핵심 개념으로 모두 이해하고 암기하자. 앞서 다룬 내용을 이해하였다면 식을 외우는 것은 그리 어렵지 않다.
 
+## Optimal Policies and Optimal Value Functions
+
+강호학습 문제를 푼다는 것은 주어진 MDP의 최적정책을 찾았다는 것과 같다. 최적정책이란 앞으로의 기대보상을 최대로 하는 정책이며 최적정책은 다른 어떤 정책보다도 높은 expected return을 보장하므로 최적정책을 찾으면 강화학습 문제의 목적을 달성하게 되는 것이다.
+
+이를 식으로 표현하기 위해 정책에 부등식을 사용하게 되는데, 정책 $\pi$가 $\pi^{\prime}$ 모든 상태 $s \in \mathcal{S}$에 대해 $v_{\pi}(s) \geq v_{\pi^{\prime}}(s)$일 때, $\pi \geq \pi^{\prime}$이라고 쓴다. 식에서 말하듯 어느 한 상태에서라도 $\pi{^\prime}$이 $\pi$보다 높은 expected return갖는다면 이와 같이 쓸 수 없다.
+
+여기서 신비로운(?) 정리 하나를 확인하고 가자.
+
+> [!NOTE]
+> **Definition: Optimal Policy**
+> 
+> Finite MDP에서 다른 어떤 정책보다도 더 좋거나 최소한 같은 정책이 적어도 하나는 반드시 존재한다.
+> 즉, 모든 상태에서 더 높은 expected return을 갖는 정책이 무조건 하나 이상은 존재한다는 것이다. Return의 귀납적 정의를 생각해보면 감을 잡기가 더 수월하다. 그리고 이런 최적의 정책을 **최적정책(optimal policy)** 이라고 한다. 최적정책은 하나 이상 존재할 수 있으며 $\pi_{*}$로 표기한다.
+
+최적정책에서의 상태가치와 행동가치 함수는 다음과 같다.
+
+> [!NOTE]
+> **Optimal State-Value Function**
+>
+> $$v_{*}(s) \doteq \max_{\pi} v_{\pi}(s) \quad \text{for all } s \in \mathcal{S}$$
+
+> [!NOTE]
+> **Optimal Action-Value Function**
+>
+> $$q_{*}(s, a) \doteq \max_{\pi} q_{\pi}(s, a) \quad \text{for all } s \in \mathcal{S}, a \in \mathcal{A}$$
+> $$q_{*}(s, a) \doteq \mathbb{E} \left[ R_{t+1} + \gamma v_{*}(S_{t+1}) \mid S_{t}=s, A_{t}=a \right]$$
+
+
 ## Reference
 
 * [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
