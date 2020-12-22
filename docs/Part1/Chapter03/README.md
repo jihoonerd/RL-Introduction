@@ -286,6 +286,39 @@ Bellman Expectation Equation은 강화학습분야에서 전반적으로 사용�
 > $$q_{*}(s, a) \doteq \max_{\pi} q_{\pi}(s, a) \quad \text{for all } s \in \mathcal{S}, a \in \mathcal{A}$$
 > $$q_{*}(s, a) \doteq \mathbb{E} \left[ R_{t+1} + \gamma v_{*}(S_{t+1}) \mid S_{t}=s, A_{t}=a \right]$$
 
+위의 상태/행동가치는 최적정책에서의 상태와 행동가치이므로 Bellman expectation equation은 최적정책을 반영해 다음과 같이 쓸 수 있게 된다.
+
+> [!NOTE]
+> **Bellman Optimality Equation for $\boldsymbol{v}_{*}$**
+>
+> $$
+\begin{aligned}
+v_{*}(s) &=\max _{a \in \mathcal{A}(s)} q_{\pi_{*}}(s, a) \\
+&=\max _{a} \mathbb{E}_{\pi_{*}}\left[G_{t} \mid S_{t}=s, A_{t}=a\right] \\
+&=\max _{a} \mathbb{E}_{\pi_{*}}\left[R_{t+1}+\gamma G_{t+1} \mid S_{t}=s, A_{t}=a\right] \\
+&=\max _{a} \mathbb{E}\left[R_{t+1}+\gamma v_{*}\left(S_{t+1}\right) \mid S_{t}=s, A_{t}=a\right] \\
+&=\max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{*}\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+
+> [!NOTE]
+> **Bellman Optimality Equation for $\boldsymbol{q}_{*}$**
+>
+> $$
+\begin{aligned}
+q_{*}(s, a) &=\mathbb{E}\left[R_{t+1}+\gamma \max _{a^{\prime}} q_{*}\left(S_{t+1}, a^{\prime}\right) \mid S_{t}=s, A_{t}=a\right] \\
+&=\sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma \max _{a^{\prime}} q_{*} \left(s^{\prime}, a^{\prime}\right)\right]
+\end{aligned}
+$$
+
+최적정책에서의 backup diagram은 다음과 같이 그려진다.
+
+<figure align=center>
+<img src="assets/images/Chapter03/Fig_3.4.png" width=70% height=70% />
+<figcaption>Backup diagrams for $v_{*}$ and $q_{*}$</figcaption>
+</figure>
+
+부채꼴 모양의 $\operatorname{max}$연산자는 앞서 보았던 Bellman expectation equation이 기댓값을 계산했던 것과는 달리 최대값을 취함을 의미한다.
 
 ## Reference
 
