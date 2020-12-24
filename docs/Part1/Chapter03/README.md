@@ -320,6 +320,27 @@ $$
 
 부채꼴 모양의 $\operatorname{max}$연산자는 앞서 보았던 Bellman expectation equation이 기댓값을 계산했던 것과는 달리 최대값을 취함을 의미한다.
 
+앞서 말한바와 같이, finite MDP에 대해서 Bellman optimality equation이 유일한(unique) 해를 가진다는 것이 밝혀져 있다.
+
+그렇다면 상태/행동가치에 대허서 optimal equation을 푸는 것이 최적정책과 어떻게 연결될까? Optimal state/action value function을 구했다면 최적정책은 간단하게 각 상태에서 최대의 return을 주는 상태 또는 행동을 선택하면 된다. 다르게 말하면 optimal state/action value function에 대해서 greedy한 선택을 하면 이 자체가 최적정책이 되는 것이다.
+
+### Bellman Optimality Equation
+
+앞에서 Bellman expectation equation과 마찬가지로 Bellman optimality equation도 아래와 같이 요약할 수 있다. Bellman expectation equation과 Bellman optimality equation 모두 이후 강화학습 개념이해에 매우 중요한 내용으로 모두 암기하는 것을 권장한다.
+
+> [!NOTE]
+> **Bellman Optimality Equation**
+> $$
+\begin{aligned}
+v_{*}(s_t) &= \max_{a} \mathbb{E}[r_{t+1} + \gamma v_{*} (s_{t+1})]\\
+q_{*}(s_t, a_t) &= \mathbb{E_{s_{t+1}}}[r_{t+1} + \gamma \max_{a^{\prime}}q_{*}(s_{t+1}, a^{\prime})]\\\\
+v_{*}(s) &= \max_{a} q_{*}(s, a)\\
+q_{*}(s, a) &= r_s^a + \gamma \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} v_{*}(s^{\prime})\\\\
+v_{*}(s_t) &= \max_{a} \left[ r_s^a + \gamma \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} v_{*}(s^{\prime})\right]\\
+q_{*}(s, a) &= r_s^a + \gamma  \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} \max_{a} q_{*}(s^{\prime}, a^{\prime})
+\end{aligned}
+$$
+
 ## Reference
 
 * [Wikipedia: Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning)
