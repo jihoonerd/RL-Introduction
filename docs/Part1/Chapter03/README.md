@@ -324,6 +324,10 @@ $$
 
 그렇다면 상태/행동가치에 대허서 optimal equation을 푸는 것이 최적정책과 어떻게 연결될까? Optimal state/action value function을 구했다면 최적정책은 간단하게 각 상태에서 최대의 return을 주는 상태 또는 행동을 선택하면 된다. 다르게 말하면 optimal state/action value function에 대해서 greedy한 선택을 하면 이 자체가 최적정책이 되는 것이다.
 
+Bellman optimality equation을 풀면 강화학습의 문제를 푸는 것과 같지만 이는 쉽지가 않다. 예를들어 앞서 확인한 상태가치에 대한 Bellman optimality equation을 보자.
+$$v_{*}(s) = \max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{*}\left(s^{\prime}\right)\right]$$
+결과적으로 위 식을 풀면 되는 것인데 위 식은 생각보다 많은 조건을 필요로한다. 일단 위의 식을 보면 $p$를 사용하고 있는데 $p$를 안다는 것은 MDP의 dynamics를 알고 있어야 한다는 것이다. 즉, 문제환경이 어떻게 움직일지 알고 있어야 한다는 상당히 강력한 전제조건이 붙게된다. 이와 더불어 수 많은 상태와 행동에 대해 각각 $\sum$, $\max$가 사용되므로 계산량도 상당할 뿐더러, MDP이므로 Markov property를 만족해야 한다. 따라서 현실적으로 Bellman optimality equation을 정확하게 풀기는 어려우며 근사적으로 푸는 방법들이 사용된다. 예로, 교재의 다음단원에서 다루는 dynamic programming도 그 중 하나의 방법이다.
+
 ### Bellman Optimality Equation
 
 앞에서 Bellman expectation equation과 마찬가지로 Bellman optimality equation도 아래와 같이 요약할 수 있다. Bellman expectation equation과 Bellman optimality equation 모두 이후 강화학습 개념이해에 매우 중요한 내용으로 모두 암기하는 것을 권장한다.
@@ -340,6 +344,17 @@ v_{*}(s_t) &= \max_{a} \left[ r_s^a + \gamma \sum_{s^{\prime} \in \mathcal{S}} P
 q_{*}(s, a) &= r_s^a + \gamma  \sum_{s^{\prime} \in \mathcal{S}} P_{s s^{\prime}}^{a} \max_{a} q_{*}(s^{\prime}, a^{\prime})
 \end{aligned}
 $$
+
+## Optimality and Approximation
+
+앞서 언급한 바와 같이 optimal policy를 찾는데에는 여러 어려움이 따른다. 우선 대부분의 경우 환경이 어떻게 변화할지에 대해 모르는 경우(model-free)가 많다. 환경의 dynamics를 안다고 해도 계산량의 문제는 결코 작은 문제가 아니다. 당장 바둑을 예로 보더라도 바둑은 환경과 규칙을 모두 알고 있는 상황이지만 수 많은 경우의 수가 존재한다. 그렇기에 AlphaGo가 바둑에서 프로기사를 압도한 것이 유의미한 발전으로 여겨지는 것이다. 그마저도 좋은 정책을 학습한 것이지 최적정책으로 수렴했는지를 이야기하기는 어렵다.
+
+교재에서 언급하는 다른 어려움으로 memory를 언급한다. 지금 다루는 tabular case, 즉 표의 각 축에 상태와 행동을, 그리고 값으로는 가치를 사용하는 접근을 사용하려면 수 많은 상태와 각 상태별 행동을 모두 나타낼 수 있는 아주 거대한 표를 만들어야 한다. 그리고 많은 경우 이런 거대한 표를 사용하는 접근은 현실적으로 불가능하다. 따라서 상태와 행동에서 가치를 추정하기 위해 함수를 사용하는 방법을 고려해보아야 한다. 다행스럽게도 neural network의 등장덕분에 아주 복잡한 비선형함수를 만드는 것이 가능해졌고 이러한 접근이 강화학습과 만나 deep reinforcement learning이라는 분야로 발전하는 중이다.
+
+강화학습은 기본적으로 return이 높은 행동을 강화하고 return이 낮은 행동을 억제하는 방식으로 학습을 하게된다. 따라서 마주칠 일이 거의 없는 상태에서의 학습을 덜 하면서 자주 발생하는 상황에서의 판단을 향상시키는 방향으로 학습을 전개할 수 있으며, 이는 일반적인 MDP를 근사적으로 푸는 방법과 대비되는 강화학습의 특징 중 하나이다.
+
+## Summary
+
 
 ## Reference
 
