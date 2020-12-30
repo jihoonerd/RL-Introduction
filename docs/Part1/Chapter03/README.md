@@ -355,6 +355,17 @@ $$
 
 ## Summary
 
+이번 문서에서는 강화학습의 구성요소와 MDP에 대해 알아보았다. 강화학습은 학습의 주체인 agent와 agent와 상호작용하는 환경이 있으며 이 상호작용은 time step이라는 단위에서 상호작용을 정의하게 된다. 그리고 이 때, agent가 환경에 가하는 작용을 행동(action)으로, 행동을 판단하는 agent가 인식하는 환경을 상태(agent)로 정의한다. 그리고 환경은 행동이 주어지면 그에 대한 보상(rewards)을 agent에게 행동의 결과인 상태와 함께 제공하게 된다. 이 때, agent입장에서 환경에 대한 정보는 완전히 알 수도, 완전히 모를 수도 있다. 정책(policy)은 상태에서 행동으로의 확률분포이다. Agent는 궁극적으로 expected return을 최대화하는 것을 목적으로 삼는다.
+
+강화학습의 문제를 풀기 위해 MDP의 개념을 도입하게 되는데 다루는 범위를 finite MDP, 즉 상태, 행동, 보상이 유한개인 공간으로 정의해 다루게 된다.
+
+Return은 앞으로 받게 될 보상의 총합이다. 다만, 수학적 편의성과 continuing task에 일관성있게 정용하기 위해 discount라는 개념을 도입해 미래의 보상에 대해 일정비율로 discount하게 된다.
+
+가치함수는 상태가치와 행동가치로 나누어 볼 수 있다. 주어진 정책을 따를 때 특정 상태에서의 expected return을 상태가치라 하며, 특정 상태와 행동의 쌍에 대한 expected return을 행동가치라고 한다. 이 둘은 Bellman expectation equation으로 표현할 수 있다. 최적정책(optimal policy)는 다른 어떤 정책보다도 더 크거나 같은 expected return을 보장하는 정책으로, 이러한 정책에서의 상태가치와 행동가치를 각각 최적상태가치, 최적행동가치라고하며 이는 Bellman optimality equation으로 표현할 수 있다.
+
+Agent가 환경에 대한 dynamics를 모두 알고 있는지(complete knowledge), 일부라도 모르고 있는지(incomplete knowledge)에 따라서 문제에 대한 접근방법이 달라지게 된다. 이 때 dynamics를 알고 있다면 다음 단원에서 다룰 dynamic programming기반의 방법을 적용해 접근할 수 있으며, dynamics를 모른다면 Monte Carlo나 temporal difference와 같은 방식을 사용하게 된다. 환경에 대한 dynamics를 모두 알고 있다고 하더라도 환경이 복잡해서 상태와 행동을 표에 적는 방식으로 나타내는 것이 현실적으로 어렵다면 approximator를 사용해 가치를 추정하는 방식을 사용하게 되면 neural network가 도입된 이후로는 approximator로 neural network를 활용하는 방식이 많이 사용되고 있다.
+
+이처럼 강화학습이 다루는 공간은 복잡한 공간으로 여러가지 제약이 필요하다. 따라서 앞으로 다루게 되는 내용들을 볼 때 이론적으로 최적정책을 구하는 방법과 현실적으로 agent가 최적정책을 근사하는 방법으로 구분해서 보는 것이 좋다.
 
 ## Reference
 
