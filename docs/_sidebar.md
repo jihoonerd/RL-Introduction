@@ -3,4 +3,5 @@
 * [Part 1](/Part1/README.md "Part 1")
   * [Chapter 2](/Part1/Chapter02/README.md "Chapter 2")
   * [Chapter 3](/Part1/Chapter03/README.md "Chapter 3")
+  * [Chapter 4](/Part1/Chapter04/README.md "Chapter 4")
 * [Glossary](/_glossary.md "Glossary")
