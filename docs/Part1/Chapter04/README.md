@@ -40,3 +40,43 @@ $$
 Loop의 순서를 보면 한 상태에서 계속 update를 하는 것이 아니라 모든 상태를 한 바퀴 다 돌고 다시 각각의 상태가 update된다는 점을 유의하자. 간단하게 모든상태에 대해서 한번씩 들리면서 $V(s)$를 update하고 한 바퀴를 다 돌았으면 다시 처음상태로 돌아가 동일한 과정을 반복하는 것이다. 이 과정을 반복하게 되면 $V(s)$ array가 어떤 값들로 수렴하게 될텐데 이 값들을 바로 실제 상태가치의 근사값이라고 보는 것이다. 여기서 의문이 생기는 점은 이런 iterative 방식이 수렴성과 존재성이 보장되느냐하는 것인데 결론부터 이야기하면 iterative policy evaluation 방법은 무한히 했을 때 실제 가치(하지만 주어지지 않는 한 영원히 알 수 없는) $v_{\pi}$로 수렴함이 증명되어 있다. 이로써 임의의 정책을 평가할 수 있는 도구를 얻게 되었다. 계속 강조하는 바지만 이 방법은 MDP를 알고 있을 때 평가할 수 있는 방법임을 상기하자. 증명에 관한 논의는 [Stack Exchange](https://ai.stackexchange.com/questions/20309/what-is-the-proof-that-policy-evaluation-converges-to-the-optimal-solution)에 언급되어 있다.
 
 ## Policy Improvement
+
+정책의 평가에 대해서 알아보았다. 궁극적으로는 정책을 평가해서 더 나은 정책을 찾는데 강화학습의 목적이 있다. 정책 $\pi$의 가치함수 $v_{\pi}$를 갖고 있다고 해보자. 임의의 상태 $s$에서 현재 정책 $\pi$를 따를지 다른 정책을 선택할지를 판단하는 기준을 생각해볼때, 행동가치함수를 생각해볼 수 있다. 행동가치에 대한 Bellman expectation equation은 다음과 같다.
+
+$$
+\begin{aligned}
+q_{\pi}(s, a) & \doteq \mathbb{E}\left[R_{t+1}+\gamma v_{\pi}\left(S_{t+1}\right) \mid S_{t}=s, A_{t}=a\right] \\
+&=\sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+
+만약 어떤 행동 $a$를 선택했을 때, $q(s,a)$가 $v_{\pi}(s)$보다 크다면 현재 정책은 적어도 최적이 아니다. $a$를 선택함으로써 더 높은 기대 return을 얻을 수 있기 때문이다. 같은 논리로 모든 상태 $s$에 대해서 더 높은 $q(s,a)$를 만드는 $a$를 선택하는 것만으로도 더 좋은 정책이 된다. 이러한 논리는 **policy improvement theorem**에 의해 정당화된다.
+
+두 정책 $\pi, \pi^{\prime}$이 있다고 해보자. 모든 상태 $s \in \mathcal{S}$에 대해서 $q_{\pi}\left(s, \pi^{\prime}(s)\right) \geq v_{\pi}(s)$이면 $\pi^{\prime}$은 $\pi$보다 더 좋은 정책임이 자명하다. 이에 대한 증명은 다음과 같다.
+
+$$
+\begin{aligned}
+v_{\pi}(s) & \leq q_{\pi}\left(s, \pi^{\prime}(s)\right) \\
+&=\mathbb{E}\left[R_{t+1}+\gamma v_{\pi}\left(S_{t+1}\right) \mid S_{t}=s, A_{t}=\pi^{\prime}(s)\right] \\
+&=\mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma v_{\pi}\left(S_{t+1}\right) \mid S_{t}=s\right] \\
+& \leq \mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma q_{\pi}\left(S_{t+1}, \pi^{\prime}\left(S_{t+1}\right)\right) \mid S_{t}=s\right] \\
+&=\mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma \mathbb{E}\left[R_{t+2}+\gamma v_{\pi}\left(S_{t+2}\right) \mid S_{t+1}, A_{t+1}=\pi^{\prime}\left(S_{t+1}\right)\right] \mid S_{t}=s\right] \\
+&=\mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma R_{t+2}+\gamma^{2} v_{\pi}\left(S_{t+2}\right) \mid S_{t}=s\right] \\
+& \leq \mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma R_{t+2}+\gamma^{2} R_{t+3}+\gamma^{3} v_{\pi}\left(S_{t+3}\right) \mid S_{t}=s\right] \\
+& \vdots \\
+& \leq \mathbb{E}_{\pi^{\prime}}\left[R_{t+1}+\gamma R_{t+2}+\gamma^{2} R_{t+3}+\gamma^{3} R_{t+4}+\cdots \mid S_{t}=s\right] \\
+&=v_{\pi^{\prime}}(s)
+\end{aligned}
+$$
+
+위 증명은 특정 상태 $s$에 대해서 전개된 것인데 같은 아이디어를 확장해서 모든 상태에서 가능한 모든 행동에 대해 $q_{\pi}(s,a)$를 최대로 하는 $a$를 선택하게 할 수도 있다. 이러한 방식을 **greedy policy**라고 하며 다음과 같이 표현할 수 있다.
+
+$$
+\begin{aligned}
+\pi^{\prime}(s) & \doteq \underset{a}{\arg \max } q_{\pi}(s, a) \\
+&=\underset{a}{\arg \max } \mathbb{E}\left[R_{t+1}+\gamma v_{\pi}\left(S_{t+1}\right) \mid S_{t}=s, A_{t}=a\right] \\
+&=\underset{a}{\arg \max } \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+
+이러한 방식은 이후상태를 고려하지 않아 근시안적인 정책이라고 할 수 있다. 지금의 선택이 이후에 어떻게 영향을 줄지는 고려하지 않고 당장의 행동가치가 큰 행동만 선택하기 때문이다. 딱 다음단계만 내다보고(one step of lookahead) 행동을 결정하는 것이다.
