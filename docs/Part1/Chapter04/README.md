@@ -80,3 +80,18 @@ $$
 $$
 
 이러한 방식은 이후상태를 고려하지 않아 근시안적인 정책이라고 할 수 있다. 지금의 선택이 이후에 어떻게 영향을 줄지는 고려하지 않고 당장의 행동가치가 큰 행동만 선택하기 때문이다. 딱 다음단계만 내다보고(one step of lookahead) 행동을 결정하는 것이다.
+
+Greedy policy는 그 자체로 $q_{\pi}\left(s, \pi^{\prime}(s)\right) \geq v_{\pi}(s)$이므로 policy improvement theorem을 만족한다. 따라서 적어도 greedy policy는 적어도 현재 정책보다 비슷하거나 더 좋은 정책이다. 중요한 것은 현재 정책보다 개선된 더 좋은 정책을 찾는 것이므로 현재 정책의 가치함수에 대해 greedy하게 만듦으로써 개선할 수 있으며 이러한 방식을 **policy improvement**라고 한다.
+
+새로운 greedy policy $\pi^{\prime}$이 있고 이보다 좋지는 못한 이전 정책 $\pi$가 있다고 해보자. $\pi^{\prime}$은 greedy정책이므로 다음이 성립한다.
+
+$$
+\begin{aligned}
+v_{\pi^{\prime}}(s) &=\max _{a} \mathbb{E}\left[R_{t+1}+\gamma v_{\pi^{\prime}}\left(S_{t+1}\right) \mid S_{t}=s, A_{t}=a\right] \\
+&=\max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi^{\prime}}\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+
+위 식은 정확하게 Bellman optimality equation과 동일하다! 따라서 $v_{\pi^{\prime}}$은 optimal value function인 $v_{*}$여야 하며 $\pi$, $\pi^{\prime}$은 optimal policy여야 한다.
+
+이러한 policy improvement, 즉 greedy policy를 새로운 정책으로 사용하는 방식은 기존 정책보다 좋다는 것이 보장되며 이를 사용해 정책을 개선한다는 것이 policy improvement이다.
