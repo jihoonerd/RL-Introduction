@@ -95,3 +95,27 @@ $$
 위 식은 정확하게 Bellman optimality equation과 동일하다! 따라서 $v_{\pi^{\prime}}$은 optimal value function인 $v_{*}$여야 하며 $\pi$, $\pi^{\prime}$은 optimal policy여야 한다.
 
 이러한 policy improvement, 즉 greedy policy를 새로운 정책으로 사용하는 방식은 기존 정책보다 좋다는 것이 보장되며 이를 사용해 정책을 개선한다는 것이 policy improvement이다.
+
+## Policy Iteration
+
+일단 정책 $\pi$가 주어지면 정책평가를 통해 $v_{\pi}$를 구하고 이를 이용해 $\pi^{\prime}$으로 개선할 수 있다. 이는 반복적으로 사용이 가능하다. $\pi^{\prime}$에 대해서 다시 정책평가를 해서 $v_{\pi^{\prime}}$를 구하고 이를 이용해서 다시 개선해 $\pi^{\prime \prime}$으로 나아갈 수 있다. 이렇게 정책평가와 정책개선을 반복하면 최적정책(optimal policy)으로 나아갈 수 있다.
+
+$$
+\pi_{0} \stackrel{\mathrm{E}}{\longrightarrow} v_{\pi_{0}} \stackrel{\mathrm{I}}{\longrightarrow} \pi_{1} \stackrel{\mathrm{E}}{\longrightarrow} v_{\pi_{1}} \stackrel{\mathrm{I}}{\longrightarrow} \pi_{2} \stackrel{\mathrm{E}}{\longrightarrow} \cdots \stackrel{\mathrm{I}}{\longrightarrow} \pi_{*} \stackrel{\mathrm{E}}{\longrightarrow} v_{*}
+$$
+
+이러한 방식으로 최적정책을 구하는 방식을 **policy iteration**이라고 한다. 다음의 pseudocode를 통해 구체적으로 이해해보자.
+
+<figure align=center>
+<img src="assets/images/Chapter04/Policy_Iteration.png" width=80% height=80%/>
+<figcaption>Policy Iteration</figcaption>
+</figure>
+
+우선 상태가치에 대한 table을 초기화해준다. 정책 $\pi$도 초기에는 임의의 확률로 채워지게 된다. 이제 정책평가와 정책개선을 반복하면 된다. 정책평가는 앞의 iterative policy evaluation과 같다. 각 상태마다 들리면서 해당 생태의 상태가치를 저장하고 Bellman expectation equation으로 상태를 업데이트 한다. 그리고 상태의 변화가 사전정의한 $\theta$보다 작아질 때 까지 반복해 정책평가를 반복하게 된다. 이 과정이 끝나면 현재 정책 $\pi$에 대한 상태가치함수를 수렴시킬 수 있다. 이제 정책개선을 하면 된다. 정책개선은 간단하게 greedy하게 action을 골라주면 된다. 정책평가를 통해 이전 정책 $\pi$에서의 상태가치를 수렴시켰으므로, 각 상태를 돌면서 가장 높은 상태가치값을 갖는 다음 상태로 가는 행동을 선택하는 정책으로 update하면 된다. 이렇게 선택하는 정책이 $\pi^{\prime}$이 된다. 특히, 하나의 상태라도 이전정책과 다른 행동이 선택되었다면 policy-stable은 false로 update되고 정책평가를 update된 정책에 대해서 다시 시행하게 된다. 이 과정을 반복하며 정책 개선 이후 모든 상태에서 이전 정책과 동일한 행동이 선택되면 비로소 정책이 stable하다고 판단하고 해당 시점의 상태가치와 정책을 각각 optimal value function \(v_{*}\), optimal policy \(\pi_{*}\)라고 판단하게 된다. 단순화 하면 다음과 같다.
+
+1. 상태가치와 정책 초기화
+2. 정책평가(iterative policy evaluation)
+3. 정책개선(greedy)
+4. 이전정책과 개선된 정책이 동일한 행동을 선택할 때 까지 2~3 반복
+
+임의의 수로 채워진 상태가치와 정책에서 최적정책이 찾아지는 과정은 생각해보면 매우 신기하게 보이기도 한다. 이 신기한 과정은 속을 열고 보면 policy improvement theorem이 있기에 가능한 것이다.
