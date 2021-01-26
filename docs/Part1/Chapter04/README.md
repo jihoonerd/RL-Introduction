@@ -146,4 +146,8 @@ Pseudocode를 살펴보자.
 
 수렴여부를 결정할 threshold를 충분히 작은 값으로 설정하고 가치함수 $V(s)$를 임의의 값으로 초기화한다. 이후 policy evaluation에 해당하는 loop를 돌게 되는데 각각의 상태를 방문하며 Bellman optimality equation을 사용해 가치함수를 추정한다. 여기서 눈여겨볼 점은 policy improvement없이 threshold조건을 만족할 때 까지 계속 반복하는 것이다. 이는 high-level에서 생각해보면 agent가 실제 행동을 하는 것이 아닌 머리속으로 가능한 결과들을 simulation해보면서 최적의 정책을 찾는 과정이다. MDP를 알고 있다고 가정했을때 사용 가능한 방식이므로 실제 환경과의 상호작용이 필요하지 않다. 식에서 $p$를 사용하고 있음에 유의하자. 이렇게 가치함수를 수렴시키게 되면 이 가치함수에 대해서 greedy하게 행동을 고르는 방식인 $\pi(s)=\arg \max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma V\left(s^{\prime}\right)\right]$이 최적정책이 된다.
 
-언급한 대로 policy iteration처럼 policy evaluation을 무한히 수렴시키는 것이 아닌 one sweep으로만 평가하므로 수렴속도가 빠르다.
+언급한 대로 policy iteration처럼 policy evaluation을 무한히 수렴시키는 것이 아닌 policy evaluation과 policy improvement를 각각 one sweep으로만 평가, 개선하므로 수렴속도가 빠르다.
+
+## Asynchronous Dynamic Programming
+
+DP 방식의 단점은 MDP의 전체 상태에 대해서 방문하는 과정(sweep)이 필요하다는 것이다. 복잡한 문제일 수록 MDP의 상태공간은 이렇게 하나하나 방문하기에는 너무도 크다는 문제가 생기게 된다. **Asynchronous DP** 방법은 일반적인 DP방법과는 다르게 각각의 상태를 모두 거쳐가지 않아도 되는 in-place iterative DP 방식이다. In-place는 table에 값을 update할 때 해당 위치를 덮어써버리는 방식으로 생각하면 된다. 기존에는 별도의 변수에 저장을 해두고 update를 할 때 assign을 해주었다면 in-place에서는 table 값 자체를 바로 바꾸어 버리기 중간에 저장하기 위한 별도 변수를 사용할 필요가 없다는 장점이 있으나 update에 참조하는 위치가 update를 할 위치라는 점 때문에 불안정할 수 있다는 단점도 있다. Asynchronous DP의 특징은 그 이름에서 나타나듯 비동기적이라는 것이다. 일반적인 DP가 순처작으로 상태를 방문했다면 asynchronous DP는 임의의 순서로 방문할 수도 있고 one sweep을 돌기전에 이미 방문한 상태들을 미리 update하는 것도 가능하다. 물론 올바르게 수렴하기 위해서는 asynchronous DP라고 해도 모든 상태들에 대해서 update가 이루어져야 한다. 완벽하게 비동기적인 아닌 이유는 임의의 순서로 방문해 update하더라도 일정 수준에서는 모든 상태를 방문해야만 계산이 가능한 경우도 발생하기 때문이다. 그럼에도 불구하고 asynchronous DP가 갖는 의의는 update할 상태를 고르는데 유연성을 제공한다는데 있다.
