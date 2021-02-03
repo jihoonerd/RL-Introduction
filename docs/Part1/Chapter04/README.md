@@ -160,4 +160,14 @@ Asynchronous DP의 예로 asynchronous value iteration을 알아보면, 이 방�
 
 앞서 다룬 policy iteration은 정책평가와 정책개선을 번갈아가며 수행해 최적정책을 찾는 방식이다. 정책개선작업을 시작하기 위해서는 앞선 정책평가가 끝나기를 기다려야 하고 정책 평가를 하기 전에는 정책개선이 마무리되기를 기다렸다가 시작해야한다. 하지만 generalized policy iteration은 이러한 과정에 대해 "반드시 번갈아가면서 수행해야만 할까?"라는 물음에서 출발한다. 당장 value iteration만 보더라도 정책평가는 단 한 번이루어지며 그 다음부터는 Bellman optimality equation을 사용해 바로 정책 개선에 들어간다. Asynchronous DP에서는 sweep하는 방식도, update하는 시점도 on the fly로 했었다. 어떻게든 평가와 개선이 모든 상태들에 대해서 계속 이루어진다면 최종적으로는 최적가치함수나 최적정책으로 갈 수 있다.
 
-이렇게 정책평가와 정책개선이 상호작용하는 방식을 독립적으로 바라보는 관점을 **generalized policy iteration (GPI)**라고 한다.
+이렇게 정책평가와 정책개선이 상호작용의 관점에서 바라보는 것을 **generalized policy iteration (GPI)**라고 한다. 이 때 각 방식의 자잘한 세부사항들과는 독립적으로 보는 관점을 갖는다. 책에서 다루고자 하는 요점은 정책평가와 정책개선은 각각 policy, value function의 관계로 서로 영향을 주고 받는다는 내용이다. 앞서, 최적가치함수에서의 greedy는 그 자체로 최적정책이 된다는 것과 Bellman optimality equation와 같은 맥락이다. 따라서 정책함수와 가치함수는 서로 영향을 계속 주고 받게 된다.
+
+정책평가와 정책개선은 내재적으로 경쟁하고 협력하는 관계로 볼 수 있음을 제시한다. 정책을 가치함수에 대해서 greedy하게 잡으면 greedy한 정책은 가치함수를 부정확하게 만들게 되고 가치함수를 정책에 대해서 많이 변하지 않게 한다면 정책을 greedy하게 쓰기 어렵게 된다. 정책개선단계는 greedy하게 가치함수를 exploit하려고 할 것이고, 정책평가는 현재 정책을 사용해 가치함수를 수렴시키려 할 것이다. 학습과정에서 이 둘은 각자 단계에서의 목적을 달성하려고 하며 이 때 찾아지는 타협점이 최적가치함수, 최정정책이 된다는 관점으로도 볼 수 있다.
+
+<figure align=center>
+<img src="assets/images/Chapter04/GPI.png" width=100% height=100%/>
+<figcaption>Iterative Policy Evaluation</figcaption>
+</figure>
+
+또 다른 관점은 GPI의 정책평가와 정책개선을 각각의 제한조건 또는 목표로 볼 수 있다. 위의 그림처럼 최적가치함수와 최적정책으로 수렴시키기 위해서 가치함수의 방향과 정책의 방향은 서로 작용하며 최적점으로 나아갈 수 있게 해준다. 각각의 화살표는 policy iteration으로 해석할 수 있다.
+
