@@ -171,3 +171,10 @@ Asynchronous DP의 예로 asynchronous value iteration을 알아보면, 이 방�
 
 또 다른 관점은 GPI의 정책평가와 정책개선을 각각의 제한조건 또는 목표로 볼 수 있다. 위의 그림처럼 최적가치함수와 최적정책으로 수렴시키기 위해서 가치함수의 방향과 정책의 방향은 서로 작용하며 최적점으로 나아갈 수 있게 해준다. 각각의 화살표는 policy iteration으로 해석할 수 있다.
 
+## Efficiency of Dynamic Programming
+
+DP방식은 일반적으로 큰 규모의 문제를 푸는데 적합하지 않지만 다른 MDP solver에 비교하면 효율적인 편이다. DP방법을 최적정책을 찾는데 필용한 worst case time은 상태와 행동의 다항식꼴로 표현되게 된다. 상태의 개수는 $n$ 행동의 개수를 $k$라고 할때, DP방법은 $k^{n}$개인 전체 정책에 대해서 최적정책을 찾을 수 있음이 보장되어 있다. Linear programming으로도 MDP를 풀 수는 있지만 DP보다 훨씬 적은 상태개수에 대해서도 현실적으로 풀기가 어려워지며 규모가 커지는 경우에는 사실상 DP만이 유일한 선택지가 된다. DP는 차원의 저주(curse of dimensionality)로 인해 사용에 제한이 있는 것으로 여겨지지만 이는 문제 자체가 갖는 어려움이지 DP에 국한된 문제만은 아니다. DP는 direct search나 linear programming에 비해서는 분명 큰 문제들에 접근하기 좋은 방식이다.
+
+실제로 오늘날 향상된 계산성능을 활용해 규모가 큰 MDP문제들을 풀어내고 있으며 앞서 언급된 DP는 교과서에만 언급된 방법이 아닌 현역으로 사용되는 알고리즘들이다. Policy iteration이나 valute iteration은 어느 하나가 일반적으로 좋다고 말하기는 어렵지만, 두 방식 모두 이론적인 worst-case run time보다 빨리 최적정책으로 수렴하는 경향을 보이며 특히 좋은 초기상태에서 시작할 경우 이런 경향은 두드러진다.
+
+상태공간이 큰 문제들에 대해서는 asynchronous DP방식이 선호된다. 상태가 커질수록 정책평가를 위한 one sweep의 비용도 비례해서 커지게 된다. 지금 다루는 part는 tabular method라는 점을 상기하자. 상태공간이 커지면 table의 크기도 커지게 되고 synchronous방식에서는 table의 모든 행을 한 바퀴 돌아야 sweep이 끝나는 것이다. 다만, 문제를 푸는데 모든 상태가 동등하게 중요하지는 않으므로 최적정책에 필요한 상태들을 비교적 정확하게 추정했다면 규모가 큰 MDP도 풀 수 있는 가능성이 열려있다. 이러한 경우에는 asynchronous 방식이나 GPI의 variants를 활용해서 synchronous 방법보다 충분히 좋은 정책을 빠르게 찾아낼 수 있게 된다.
