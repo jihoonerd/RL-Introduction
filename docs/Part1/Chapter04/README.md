@@ -178,3 +178,18 @@ DP방식은 일반적으로 큰 규모의 문제를 푸는데 적합하지 않�
 실제로 오늘날 향상된 계산성능을 활용해 규모가 큰 MDP문제들을 풀어내고 있으며 앞서 언급된 DP는 교과서에만 언급된 방법이 아닌 현역으로 사용되는 알고리즘들이다. Policy iteration이나 valute iteration은 어느 하나가 일반적으로 좋다고 말하기는 어렵지만, 두 방식 모두 이론적인 worst-case run time보다 빨리 최적정책으로 수렴하는 경향을 보이며 특히 좋은 초기상태에서 시작할 경우 이런 경향은 두드러진다.
 
 상태공간이 큰 문제들에 대해서는 asynchronous DP방식이 선호된다. 상태가 커질수록 정책평가를 위한 one sweep의 비용도 비례해서 커지게 된다. 지금 다루는 part는 tabular method라는 점을 상기하자. 상태공간이 커지면 table의 크기도 커지게 되고 synchronous방식에서는 table의 모든 행을 한 바퀴 돌아야 sweep이 끝나는 것이다. 다만, 문제를 푸는데 모든 상태가 동등하게 중요하지는 않으므로 최적정책에 필요한 상태들을 비교적 정확하게 추정했다면 규모가 큰 MDP도 풀 수 있는 가능성이 열려있다. 이러한 경우에는 asynchronous 방식이나 GPI의 variants를 활용해서 synchronous 방법보다 충분히 좋은 정책을 빠르게 찾아낼 수 있게 된다.
+
+## Summary
+
+이번 문서에서는 finite MDP를 푸는 방법으로서의 dynamic programming 방법들을 알아보았다.
+
+Policy evaluation은 주어진 정책을 사용해서 가치함수를 반복적으로 추정하는 방식이며 policy improvement는 주어진 가치함수를 사용해서 정책을 개선하는 것으로 가장 쉬운 방식으로는 greedy policy가 있다. 이 둘을 순차적으로 사용하게 되면 policy iteration이나 value iteration의 방법이 된다.
+
+Classical DP 방법에서는 모든 상태를 방문하는 sweep을 수행하면서 update를 하게된다. 이 과정에서 수행하는 update는 Bellman expected/optimality equation을 사용하게 되며 이는 backup diagram과 같이 보면서 이해하는 것이 많은 도움이 된다.
+
+거의 대부분의 강화학습 방법은 정책평가와 개선단계가 포함되므로 일반적인 관점에서 정책반복법으로 생각해볼 수 있고 이러한 관점을 generalized policy iteration(GPI)로 다루었다. GPI는 특정한 알고리즘을 지칭하는게 아니라 개념/관점이다 보니 정책과 가치함수를 번갈아 추정하며 나아가는 개념으로 이해하도 괜찮을 것이다. 정책평가 단계에서는 평가할 정책이 고정되고 해당 정책을 사용해 가치를 평가하며 정책개선 단계에서는 가치함수가 고정되고 이를 통해 정책을 개선해 나아가게 된다.
+
+DP 방법에는 꼭 sweep을 완전하게 돌면서 update하는 방식 이외에도 비동기적으로 학습하는 asynchronous DP이 있음을 보았다. Asynchronous DP에서는 sweep을 완전히 돌지도, 순서대로 돌지도 않는다.
+
+DP방법의 성질 중 하나로 추정치로 추정치를 update하는 bootstrapping이라는 방법이 있다. 그리고 booststrapping은 MDP를 완전히 알고있음을 가정하는 DP방식이 아닌 경우(model-free)에도 사용하는 방법으로 이후에 자세히 다루게 된다.
+
