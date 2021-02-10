@@ -11,3 +11,21 @@ MC방식은 강화학습의 문제를 sample return의 기대값을 이용해 �
 이러한 특성으로 인해 MC방법은 적어도 episode가 끝나야 가치함수와 정책에 대해 update를 수행할 수 있다. 후에 다루겠지만 이는 각 step마다 upate가 가능한 temporal difference방식과 대비되는 차이점이다. 강화학습에서의 Monte Carlo는 이처럼 **완전한(complete)** return의 평균에 기반한 학습방식을 의미한다.
 
 MDP가 주어진 DP에서는 가치함수를 MDP를 이용해 계산할 수 있었지만 MDP에 대한 정보를 모를 때는 가치함수를 sample return을 통해 학습을 해야한다는 큰 차이가 있다. 이렇게 학습한 가치함수와 정책에 GPI의 아이디어를 사용해 최적가치/정책을 추정할 수 있게 된다. 이번 단원에서도 DP에서와 마찬가지로 주어진 정책을 평가하는 정책평가단계와 정책개선단계로 나누어 문제를 접근한다. 하지만 이번 단원에서는 Monte Carlo 방법을 사용해 과정을 수행하게 된다.
+
+## 5.1 Monte Carlo Prediction
+
+Prediction은 주어진 정책을 평가하는 과정이며 이 평가는 가치함수를 추정하는 과정이 된다. 상태가치의 정의를 상기해보면 해당 상태에서 앞으로 받을 return의 기대값으로 정의가 되었다. 따라서 가장 직관적인 추정은 경험을 통해 해당 상태이후에 받은 보상들을 모두 더한 값들의 평균을 구하는 것이다. 이러한 경험이 많아질수록 더 정확한 값으로 수렴을 할 것이라는 것이 Monte Carlo 방법의 기본적인 아이디어이다.
+
+상태가치 $v_{\pi}(s)$가 의미하는 바는 상태 $s$에서 정책 $\pi$를 따라 episode를 진행했을 때 받을 return의 기대값이다. 이 때, episode가 진행되는 동안 방문한 상태들을 $s$의 **visit**이라고 한다. 물론 각각의 상태는 episode가 진행되면서 여러차례 방문할 수 있으며 최초의 방문에 한정해서 $s$의 first visit이라고 해보자. First visit을 따로 정의하는 이유는 다음과 같은 두 가지 방법을 생각해 볼 수 있기 때문이다.
+
+* first-visit MC method
+* every-visit MC method
+
+First-visit MC method에서는 $s$의 최초 방문을 기준으로 return의 평균을 구해 $v_{\pi}(s)$를 추정한다. 반면, every-visit MC method에서는 이후에 방문하는 $s$들 각각에 대한 return의 평균을 통해 가치를 추정한다. 이번 문서에서는 first-visit MC method를 주로 다루게 되며 every-visit MC method에 대해서는 function approximation과 eligibility trace라는 개념과 함께 이후에 다루게 된다. 아래 pseudocode에서 every-visit은 fist-visit과 대부분 같으나 마지막에서 세번째 줄인 $S_{t}$가 이미 평가되었는지를 확인하는 조건이 없다는 차이가 있다.
+
+<figure align=center>
+<img src="assets/images/Chapter05/fv-mc-pred.png"/>
+<figcaption>First-visit MC prediction</figcaption>
+</figure>
+
+두 방식 모두 무한히 많은 경우를 반복하게 되면 큰 수의 법칙(the law of large numbers)에 의해 실제 값인 $v_{\pi}(s)$로 수렴하게 된다. 가치함수의 정의가 $v_{\pi}(s_{t}) = \mathbb{E}_{\pi} [G_{t} \mid s = s_{t}]$이므로 각각의 상태에서 return을 구하는 것은 unbiased estimate이 되고, 무수히 많은 episode에 대해 이를 반복하게 되면 실제 return으로 수렴시킬 수 있다.
