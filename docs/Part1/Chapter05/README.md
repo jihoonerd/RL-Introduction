@@ -29,3 +29,18 @@ First-visit MC method에서는 $s$의 최초 방문을 기준으로 return의 �
 </figure>
 
 두 방식 모두 무한히 많은 경우를 반복하게 되면 큰 수의 법칙(the law of large numbers)에 의해 실제 값인 $v_{\pi}(s)$로 수렴하게 된다. 가치함수의 정의가 $v_{\pi}(s_{t}) = \mathbb{E}_{\pi} [G_{t} \mid s = s_{t}]$이므로 각각의 상태에서 return을 구하는 것은 unbiased estimate이 되고, 무수히 많은 episode에 대해 이를 반복하게 되면 실제 return으로 수렴시킬 수 있다.
+
+Monte Carlo 방법은 가장 쉽게 추정치를 얻을 수 있는 방법이다. 그런데 만약 MDP에 대한 완전한 정보를 알고 있으면 DP를 사용하는 것이 무조건 유리할까? 꼭 그렇지는 않다. MDP, 특히 transition probability matrix를 알고 있다고 하더라도 episode가 진행되는 동안 각각의 확률을 반영해 미리 계산하는 것은 쉽지 않다. 후에 다루겠지만 Monte Carlo는 bootstrap관점에서 backup diagram을 수직으로 끝까지 깊이 탐색하는 방법이라면 DP는 backup diagram 기준으로 width 방향으로 모두 계산해보아야 하는 과정이다. 따라서 MDP를 안다고 하더라도 DP에 필요한 확률을 모두 반영하는 것은 여전히 간단한 문제가 아니며 그 과정에서 확률이 연쇄적으로 만들어내는 오차와 복잡도도 커지게 된다. Monte Carlo는 단지 쉽게 추정치를 얻는 방법이 아니라 그 자체로도 강력한 추정 기법이 된다.
+
+그렇다면 Monte Carlo 방법의 backup diagram은 어떻게 그려질까? 말 그대로 해보고 확인하는 방법인 만큼 시작 state에서 시작해서 terminal state까지의 trajectory를 한 줄로 그려낸 형태가 된다.
+
+<figure align=center>
+<img src="assets/images/Chapter05/mc_backup_diagram.png"/>
+<figcaption>Backup diagram of Monte Carlo Methods</figcaption>
+</figure>
+
+이는 앞서 본 DP의 backup diagram과 대비된다. DP에서는 가능한 모든 transition을 고려해야하므로 가능한 상태와 행동이 모두 표시된다. 반면 Monte Carlo는 경험한 하나의 trajectory만 표시된다. 또한 DP는 one-step transition, 즉 상태에서 가능한 행동과 state-action pair에 대한 transition probability matrix에 의해 도착하는 다음 상태까지 표현되는 반면, Monte Carlo diagram에서는 terminal state까지 하나의 완전한 episode가 표시된다. Backup diagram에서 볼 수 있는 알고리즘의 차이를 알아두는 것은 중요하다.
+
+또한 Monte Carlo의 중요한 성질 중 하나는 각각의 상태에 대한 추정값은 독립적이라는 것이다. Monte Carlo methods에서 각각의 trajectory는 독립적으로 수행된 일련의 과정들로 다른 추정치와는 독립적이다. 앞의 단원에서 다루었듯, DP에서는 다음 상태의 추정치를 사용해 현재 상태를 update하므로 DP는 다른 상태의 추정치에 대해 독립적이라고 할 수 없다.
+
+이는 한 상태의 가치를 추정한다고 할 때 terminal state까지 몇 개의 상태가 있든지 상관없다는 것을 의미한다. 최종 return을 알았으면 시작한 상태의 가치는 바로 추정하면 된다. 그리고 동일한 상태에서 여러 episode를 끝까지 진행한 뒤에 평균을 내면 더 정확한 추정을 할 수 있고 이게 Monte Carlo의 핵심 아이디어이다.
