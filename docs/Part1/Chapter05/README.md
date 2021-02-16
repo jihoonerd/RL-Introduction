@@ -12,7 +12,7 @@ MC방식은 강화학습의 문제를 sample return의 기대값을 이용해 �
 
 MDP가 주어진 DP에서는 가치함수를 MDP를 이용해 계산할 수 있었지만 MDP에 대한 정보를 모를 때는 가치함수를 sample return을 통해 학습을 해야한다는 큰 차이가 있다. 이렇게 학습한 가치함수와 정책에 GPI의 아이디어를 사용해 최적가치/정책을 추정할 수 있게 된다. 이번 단원에서도 DP에서와 마찬가지로 주어진 정책을 평가하는 정책평가단계와 정책개선단계로 나누어 문제를 접근한다. 하지만 이번 단원에서는 Monte Carlo 방법을 사용해 과정을 수행하게 된다.
 
-## 5.1 Monte Carlo Prediction
+## Monte Carlo Prediction
 
 Prediction은 주어진 정책을 평가하는 과정이며 이 평가는 가치함수를 추정하는 과정이 된다. 상태가치의 정의를 상기해보면 해당 상태에서 앞으로 받을 return의 기대값으로 정의가 되었다. 따라서 가장 직관적인 추정은 경험을 통해 해당 상태이후에 받은 보상들을 모두 더한 값들의 평균을 구하는 것이다. 이러한 경험이 많아질수록 더 정확한 값으로 수렴을 할 것이라는 것이 Monte Carlo 방법의 기본적인 아이디어이다.
 
@@ -44,3 +44,7 @@ Monte Carlo 방법은 가장 쉽게 추정치를 얻을 수 있는 방법이다.
 또한 Monte Carlo의 중요한 성질 중 하나는 각각의 상태에 대한 추정값은 독립적이라는 것이다. Monte Carlo methods에서 각각의 trajectory는 독립적으로 수행된 일련의 과정들로 다른 추정치와는 독립적이다. 앞의 단원에서 다루었듯, DP에서는 다음 상태의 추정치를 사용해 현재 상태를 update하므로 DP는 다른 상태의 추정치에 대해 독립적이라고 할 수 없다.
 
 이는 한 상태의 가치를 추정한다고 할 때 terminal state까지 몇 개의 상태가 있든지 상관없다는 것을 의미한다. 최종 return을 알았으면 시작한 상태의 가치는 바로 추정하면 된다. 그리고 동일한 상태에서 여러 episode를 끝까지 진행한 뒤에 평균을 내면 더 정확한 추정을 할 수 있고 이게 Monte Carlo의 핵심 아이디어이다.
+
+## Monte Carlo Estimation of Action Values
+
+Model을 모르는 상황에서는 state action pair를 통해서 얻는 action value가 유용하다. Backup diagram을 상태가치에서 생각해보면, 현재상태에서 정책에 의한 행동, 그리고 transition probability matrix에 의해 다음 상태로 연결이 된다. 하지만 model을 모른다면 transition probability matrix를 모르므로 행동을 선택할 때, 다음상태가 어디로 될지 알 수 없다. 하지만 action value $Q(s, a)$는 state action pair에 대해서 결과를 얻을 수 있으므로 transition probability matrix를 몰라도 사용할 수 있다. **따라서 Monte Carlo 방법의 목표는 최적 행동가치함수 $q_{*}$을 찾는 것이다.** 이를 위해서는 우선 정책평가를 어떻게 할 지를 정해야 한다.
