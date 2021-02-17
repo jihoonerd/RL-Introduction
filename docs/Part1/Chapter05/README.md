@@ -48,3 +48,7 @@ Monte Carlo 방법은 가장 쉽게 추정치를 얻을 수 있는 방법이다.
 ## Monte Carlo Estimation of Action Values
 
 Model을 모르는 상황에서는 state action pair를 통해서 얻는 action value가 유용하다. Backup diagram을 상태가치에서 생각해보면, 현재상태에서 정책에 의한 행동, 그리고 transition probability matrix에 의해 다음 상태로 연결이 된다. 하지만 model을 모른다면 transition probability matrix를 모르므로 행동을 선택할 때, 다음상태가 어디로 될지 알 수 없다. 하지만 action value $Q(s, a)$는 state action pair에 대해서 결과를 얻을 수 있으므로 transition probability matrix를 몰라도 사용할 수 있다. **따라서 Monte Carlo 방법의 목표는 최적 행동가치함수 $q_{*}$을 찾는 것이다.** 이를 위해서는 우선 정책평가를 어떻게 할 지를 정해야 한다.
+
+정책평가에서는 정책이 주어지고 이 정책을 따랐을 때의 가치함수를 구하게 된다. 정책이 주어졌으므로 이 정책을 따랐을 때의 $q_{\pi}(s,a)$를 구해야 한다. 한 episode를 끝까지 진행하고 나면 episode가 진행되는 동안의 trajectory를 볼 수 있으므로 각 상태에서 선택한 행동들을 모을 수 있게 된다. 여기서 first-visit MC와 every-visit MC가 살짝 달라지는 부분이 생긴다. First-visit MC는 최초로 방문한 상태에서의 행동을 기준으로 return에 대해 평균을 내고 every-visit MC에서는 상태를 방문했던 모든 경우에 대해서 평균을 계산한다. 두 가지 방식 모두 무수히 많은 episode를 통해 계산해 나아가면 unbiased estimate이므로 실제 값으로 수렴하게 된다.
+
+여기서 exploration관점에서 생각해볼 문제가 있다. 만약 최초의 정책평가가 MC로 이루어진 뒤 정책개선이 발생한다고 해보자. 이 때 정책이 deterministic policy라면, 즉 정책이 가장 높은 Q-value를 주는 action만 선택한다면 최초에 초기화된 상태에서 최적정책이 아님에도 불구하고 더 높은 가치를 갖는 행동만을 선택해 다른 state-action pair에 대해서는 시도조차하지 않는 문제가 발생한다. 특히, 초반부에는 exploration을 적극적으로 해야하는데 이는 심각한 문제가 된다. 강화학습에서 deterministic한 정책이 탐색을 하지 못하는 문제를 **problem of maintaining exploration**이라고 한다.
