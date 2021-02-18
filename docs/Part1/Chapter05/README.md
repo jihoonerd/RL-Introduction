@@ -52,3 +52,5 @@ Model을 모르는 상황에서는 state action pair를 통해서 얻는 action 
 정책평가에서는 정책이 주어지고 이 정책을 따랐을 때의 가치함수를 구하게 된다. 정책이 주어졌으므로 이 정책을 따랐을 때의 $q_{\pi}(s,a)$를 구해야 한다. 한 episode를 끝까지 진행하고 나면 episode가 진행되는 동안의 trajectory를 볼 수 있으므로 각 상태에서 선택한 행동들을 모을 수 있게 된다. 여기서 first-visit MC와 every-visit MC가 살짝 달라지는 부분이 생긴다. First-visit MC는 최초로 방문한 상태에서의 행동을 기준으로 return에 대해 평균을 내고 every-visit MC에서는 상태를 방문했던 모든 경우에 대해서 평균을 계산한다. 두 가지 방식 모두 무수히 많은 episode를 통해 계산해 나아가면 unbiased estimate이므로 실제 값으로 수렴하게 된다.
 
 여기서 exploration관점에서 생각해볼 문제가 있다. 만약 최초의 정책평가가 MC로 이루어진 뒤 정책개선이 발생한다고 해보자. 이 때 정책이 deterministic policy라면, 즉 정책이 가장 높은 Q-value를 주는 action만 선택한다면 최초에 초기화된 상태에서 최적정책이 아님에도 불구하고 더 높은 가치를 갖는 행동만을 선택해 다른 state-action pair에 대해서는 시도조차하지 않는 문제가 발생한다. 특히, 초반부에는 exploration을 적극적으로 해야하는데 이는 심각한 문제가 된다. 강화학습에서 deterministic한 정책이 탐색을 하지 못하는 문제를 **problem of maintaining exploration**이라고 한다.
+
+Exploration을 충분히 일어날 수 있게 하는 것은 강화학습에서 중요하게 고려해야 하는 부분으로 가장 흔하게 사용되는 방법으로는 각 상태에서 모든 행동들이 선택될 가능성이 열려있도록 stochastic하게 정책을 만드는 것이다.
