@@ -54,3 +54,22 @@ Model을 모르는 상황에서는 state action pair를 통해서 얻는 action 
 여기서 exploration관점에서 생각해볼 문제가 있다. 만약 최초의 정책평가가 MC로 이루어진 뒤 정책개선이 발생한다고 해보자. 이 때 정책이 deterministic policy라면, 즉 정책이 가장 높은 Q-value를 주는 action만 선택한다면 최초에 초기화된 상태에서 최적정책이 아님에도 불구하고 더 높은 가치를 갖는 행동만을 선택해 다른 state-action pair에 대해서는 시도조차하지 않는 문제가 발생한다. 특히, 초반부에는 exploration을 적극적으로 해야하는데 이는 심각한 문제가 된다. 강화학습에서 deterministic한 정책이 탐색을 하지 못하는 문제를 **problem of maintaining exploration**이라고 한다.
 
 Exploration을 충분히 일어날 수 있게 하는 것은 강화학습에서 중요하게 고려해야 하는 부분으로 가장 흔하게 사용되는 방법으로는 각 상태에서 모든 행동들이 선택될 가능성이 열려있도록 stochastic하게 정책을 만드는 것이다.
+
+## Monte Carlo Control
+
+이제 MC estimation을 control에 적용해보자. Coontrol인 만큼 optimal policy를 찾는 것이 목표이다. 접근 자체는 DP에서 다루었던 GPI와 같다.
+
+<figure align=center>
+<img src="assets/images/Chapter05/mc_gpi.png"/>
+<figcaption></figcaption>
+</figure>
+
+GPI는 어떤 정책과 가치함수가 있을 때, 정책에 대한 정책평가를 통해 가치함수를 학습하고 학습된 가치함수를 통해 정책을 개선하는 과정을 반복하면 최적정책과 최적가치함수로 나아갈 수 있음을 말한다.
+
+이번 문서는 MC에 대해 다루므로 이제 GPI에 MC가 어떻게 적용되는지에 초점을 두고 알아보자. 초기정책 $\pi_{0}$가 있다고 할때, GPI의 과정은 다음과 같은 반복이 이루어진다.
+
+$$
+\pi_{0} \stackrel{\mathrm{E}}{\longrightarrow} q_{\pi_{0}} \stackrel{\mathrm{I}}{\longrightarrow} \pi_{1} \stackrel{\mathrm{E}}{\longrightarrow} q_{\pi_{1}} \stackrel{\mathrm{I}}{\longrightarrow} \pi_{2} \stackrel{\mathrm{E}}{\longrightarrow} \cdots \stackrel{\mathrm{I}}{\longrightarrow} \pi_{*} \stackrel{\mathrm{E}}{\longrightarrow} q_{*}
+$$
+
+정책평가단계에서는 MC Prediction을 사용하게 된다. 완료된 수 많은 episode를 사용해서 각 상태의 가치를 평가할 수 있다. 이러한 반복이 무한히 많아지게 되면 점근적으로 실제 가치함수에 가까워지게 된다. 이론적으로만 가능하지만 주어진 정책에 대해 무한히 많은 episode를 사용해 평가했다고 한다면 정책 $\pi_{k}$에 대한 실제 가치함수 $q_{\pi_k}$를 정확하게 계산할 수 있다.
