@@ -73,3 +73,16 @@ $$
 $$
 
 정책평가단계에서는 MC Prediction을 사용하게 된다. 완료된 수 많은 episode를 사용해서 각 상태의 가치를 평가할 수 있다. 이러한 반복이 무한히 많아지게 되면 점근적으로 실제 가치함수에 가까워지게 된다. 이론적으로만 가능하지만 주어진 정책에 대해 무한히 많은 episode를 사용해 평가했다고 한다면 정책 $\pi_{k}$에 대한 실제 가치함수 $q_{\pi_k}$를 정확하게 계산할 수 있다.
+
+정책개선은 앞서 평가한 가치함수를 사용해 간단한 greedy policy를 만드는 방법이 있다. 이 때, transition probability matrix를 모르므로 행동가치함수인 $q_{\pi}$를 사용한다. 즉, 어떤 상태 $s$에서 선택하는 행동은 다음과 같이 결정된다.
+$$\pi_(s) \doteq \argmax_{a} q(s,a)$$
+개선된 정책 $\pi_{k+1}$은 행동가치함수 $q_{\pi_k}$에 대한 greedy policy로 선택한다. Policy improvement theorem에 의해 다음이 성립한다.
+$$
+\begin{aligned}
+q_{\pi_{k}}\left(s, \pi_{k+1}(s)\right) &=q_{\pi_{k}}\left(s, \underset{a}{\arg \max } q_{\pi_{k}}(s, a)\right) \\
+&=\max _{a} q_{\pi_{k}}(s, a) \\
+& \geq q_{\pi_{k}}\left(s, \pi_{k}(s)\right) \\
+& \geq v_{\pi_{k}}(s)
+\end{aligned}
+$$
+따라서 $\pi_{k+1}$은 $\pi_{k}$보다 최소한 같거나 더 좋다는 것이 보장된다. 이러한 성질로 인해 GPI에 따라 시행하면 최적정책과 최적가치로 수렴할 수 있다. 또한 MC methods가 환경에 대한 dynamics를 전혀 모르더라도 sample episode를 활용해 최적정책을 찾을 수 있는 이론적 뒷받침이 된다.
