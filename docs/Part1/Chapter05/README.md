@@ -60,7 +60,7 @@ Exploration을 충분히 일어날 수 있게 하는 것은 강화학습에서 �
 이제 MC estimation을 control에 적용해보자. Coontrol인 만큼 optimal policy를 찾는 것이 목표이다. 접근 자체는 DP에서 다루었던 GPI와 같다.
 
 <figure align=center>
-<img src="assets/images/Chapter05/mc_gpi.png"/>
+<img src="assets/images/Chapter05/mc_gpi.png" width=30% height=30%/>
 <figcaption></figcaption>
 </figure>
 
@@ -86,3 +86,17 @@ q_{\pi_{k}}\left(s, \pi_{k+1}(s)\right) &=q_{\pi_{k}}\left(s, \underset{a}{\arg 
 \end{aligned}
 $$
 따라서 $\pi_{k+1}$은 $\pi_{k}$보다 최소한 같거나 더 좋다는 것이 보장된다. 이러한 성질로 인해 GPI에 따라 시행하면 최적정책과 최적가치로 수렴할 수 있다. 또한 MC methods가 환경에 대한 dynamics를 전혀 모르더라도 sample episode를 활용해 최적정책을 찾을 수 있는 이론적 뒷받침이 된다.
+
+알고리즘을 실제로 적용하기위해서는 정책평가단계에서 무한히 많은 정책평가를 반복하는 걸 현실적인 방법으로 바꾸어야 한다. 가장 간단한 방법 중 하나는 정책평가의 수렴을 간접적으로 확인하는 것으로 추정하는 가치함수 $q_{\pi_k}$의 변화폭이 미리 지정한 매우 작은 값 이하로 될 때까지 반복하는 것이다. 실제로 이렇게 하면 거의 수렴한 상태를 유지할 수 있다는 장점이 있지만 작은 문제에 대해서도 정책평가과정에 들어가는 연산이 많아 최적정책까지 가는데 오래걸리고 실제로 사용할 수준이 되기위해서는 매우 많은 episode에 대해 적용해야한다는 문제가 있다.
+
+다른 방법은 DP에서 다룬 것과 동일한 GPI 방식을 사용하는 것이다. 정책평가를 정해진 반복횟수 만큼만 돌리고 정책개선을 함으로써 추정된 가치함수는 부정확하더라도 더 효율적으로 최적정책을 향해 나아갈 수 있으며 극단적으로 정책평가를 1회만 하고 정책개선을 하는 value iteration도 이러한 방법 중 하나이다. In-place 방식도 생각해 볼 수 있는데, value iteration이 1회를 평가하더라도 모든 상태들에 대해 1회 평가했던 것에 반해 in-place 방식에서는 정책평가와 개선을 모든 상태가 아니라 하나의 상태에 대해 진행한다는 차이가 있다.
+
+MC policy iteration은 기본구조는 이름에서 나타나듯 policy iteration과 같다. 다만 MC 방법을 이용하므로 한 episode가 끝나야 trajectory에 대한 return을 사용할 수 있으므로 epsode단위로 정책평가와 개선이 이루어진다. Monte Carlo with Exploring Starts라고 부르는 이 방식의 pseudocode는 다음과 같다.
+
+<figure align=center>
+<img src="assets/images/Chapter05/mc-es.png" width=60% height=60%/>
+<figcaption></figcaption>
+</figure>
+
+Pseudocode를 자세히 살펴보자. 우선 정책 $\pi$와 행동가치함수 $Q$는 임의의 값으로 초기화 하고 $Q(s,a)$를 저장할 list를 준비한다. Episode마다 반복문을 실행한다. 초기 상태와 행동은은 임의로 sampling한다. 이렇게 얻은 초기 상태와 행동 $S_0$, $A_0$를 정책 $\pi$를 따라가면 trajectory를 생성한다. $T$ step 만큼 진행되고 episode가 끝났다면 $\pi: S_0, A_0, R_1, \ldots, S_{T-1}, A_{T-1}, R_{T}$와 같은 trajectory를 얻게 된다. 이제 이 trajectory를 사용해 정책평가와 개선을 진행한다. Trajectory를 역방향으로 roll out하면서 각 timestep별로 return을 계산한다. Trajectory에서 $S_t, A_t$가 나오지 않는 한 $G$에 $S_t, A_t$ pair의 return을 append하고 해당 state-action pair의 return에 있는 값들의 평균을 사용해 $Q(S_t, A_t)$를 update한다. 그리고 상태가치가 update되었으므로 정책은 update된 상태가치에서 greedy하게 작동하도록 $\argmax_{a}Q(S_t, a)$로 바꾸어 준다. 알고리즘에 exploring starts가 붙은 이유는 0이상의 확률을 갖는 모든 state-action pair가 시작점이 될 수 있기 때문이다.
+
