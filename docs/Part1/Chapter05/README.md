@@ -100,3 +100,10 @@ MC policy iteration은 기본구조는 이름에서 나타나듯 policy iteratio
 
 Pseudocode를 자세히 살펴보자. 우선 정책 $\pi$와 행동가치함수 $Q$는 임의의 값으로 초기화 하고 $Q(s,a)$를 저장할 list를 준비한다. Episode마다 반복문을 실행한다. 초기 상태와 행동은은 임의로 sampling한다. 이렇게 얻은 초기 상태와 행동 $S_0$, $A_0$를 정책 $\pi$를 따라가면 trajectory를 생성한다. $T$ step 만큼 진행되고 episode가 끝났다면 $\pi: S_0, A_0, R_1, \ldots, S_{T-1}, A_{T-1}, R_{T}$와 같은 trajectory를 얻게 된다. 이제 이 trajectory를 사용해 정책평가와 개선을 진행한다. Trajectory를 역방향으로 roll out하면서 각 timestep별로 return을 계산한다. Trajectory에서 $S_t, A_t$가 나오지 않는 한 $G$에 $S_t, A_t$ pair의 return을 append하고 해당 state-action pair의 return에 있는 값들의 평균을 사용해 $Q(S_t, A_t)$를 update한다. 그리고 상태가치가 update되었으므로 정책은 update된 상태가치에서 greedy하게 작동하도록 $\argmax_{a}Q(S_t, a)$로 바꾸어 준다. 알고리즘에 exploring starts가 붙은 이유는 0이상의 확률을 갖는 모든 state-action pair가 시작점이 될 수 있기 때문이다.
 
+## Monte Carlo Control without Exploring Starts
+
+앞에서 exploring start를 가정했지만 이는 현실적으로 사용하기 어려운 방식이다. 학습을 위해서는 모든 행동들이 충분히 선택되어 평가될 수 있어야 하는데 이를 위한 방법은 크게 **on-policy**와 **off-policy** 방법 두 가지가 있다. On-policy는 평가 또는 개선하는 정책이 행동을 결정하는 정책과 같은 경우를 말한다. 다시 말해, behavior policy와 target policy가 같은 경우이다. Off policy는 반대로 behvaior policy와 target policy가 다른 경우를 말한다.
+
+앞에서 다룬 Monte Carlo ES 방법은 on-policy 방법에 해당한다. 여기서는 우선 Monte Carlo ES에서 비현실적인 ES를 떼어내는 과정을 살펴본다.
+
+On-policy control에서 정책은 일반적으로 soft하다. Soft 정책의 의미는 모든 정책함수의 결과가 모든 상태, 행동에 대해서 양수를 갖는 경우이다. $(\pi (a \mid s))$ 모든 행동이 선택될 확률이 열려있는 것이다. 그리고 학습이 진행되면서 최적정책쪽으로 정책확률분포가 이동하게 될 것이다. 여기서 제시하는 on-policy 방법은 $\epsilon$-greedy 정책을 사용한다. $\epsilon$의 확률로 random action을 선택하고 $(1-\epsilon)$의 확률로 추저한 행동가치에 대해 greedy한 선택을 한다. 매우 간단한 다양한 환경에서 꽤나 유용한 정책임이 확인되었다.
