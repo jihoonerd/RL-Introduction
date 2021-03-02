@@ -106,4 +106,6 @@ Pseudocode를 자세히 살펴보자. 우선 정책 $\pi$와 행동가치함수 
 
 앞에서 다룬 Monte Carlo ES 방법은 on-policy 방법에 해당한다. 여기서는 우선 Monte Carlo ES에서 비현실적인 ES를 떼어내는 과정을 살펴본다.
 
-On-policy control에서 정책은 일반적으로 soft하다. Soft 정책의 의미는 모든 정책함수의 결과가 모든 상태, 행동에 대해서 양수를 갖는 경우이다. $(\pi (a \mid s))$ 모든 행동이 선택될 확률이 열려있는 것이다. 그리고 학습이 진행되면서 최적정책쪽으로 정책확률분포가 이동하게 될 것이다. 여기서 제시하는 on-policy 방법은 $\epsilon$-greedy 정책을 사용한다. $\epsilon$의 확률로 random action을 선택하고 $(1-\epsilon)$의 확률로 추저한 행동가치에 대해 greedy한 선택을 한다. 매우 간단한 다양한 환경에서 꽤나 유용한 정책임이 확인되었다.
+On-policy control에서 정책은 일반적으로 soft하다. Soft 정책의 의미는 모든 정책함수의 결과가 모든 상태, 행동에 대해서 양수를 갖는 경우이다. $(\pi (a \mid s))$ 모든 행동이 선택될 확률이 열려있는 것이다. 그리고 학습이 진행되면서 최적정책쪽으로 정책확률분포가 이동하게 될 것이다. 여기서 제시하는 on-policy 방법은 $\epsilon$-greedy 정책을 사용한다. $\epsilon$의 확률로 random action을 선택하고 $(1-\epsilon)$의 확률로 추저한 행동가치에 대해 greedy한 선택을 한다. 이러한 방식은 매우 간단한 방법이지만 다양한 환경에서 꽤나 유용한 정책임이 확인되었다. 즉, nongreedy로 행동을 선택할 때는 모든 행동공간에서 선택될 가능성이 열려있고 최소한 $\frac{\epsilon}{\lvert \mathcal{A}(\boldsymbol{s}) \rvert}$의 확률은 선택될 가능성이 보장된다. 그리고 greedy한 선택을 하면 nongreedy의 경우까지 포함해 $1-\epsilon + \frac{\epsilon}{\lvert \mathcal{A} (\boldsymbol{s})\rvert}$의 확률을 갖게 된다. $\epsilon$-greedy는 $\epsilon$-soft에 속하는 방법으로 $\pi(a \mid s) \geq \frac{\varepsilon}{|\mathcal{A}(s)|}$를 모든 상태와 공간에 대해 보장해준다.
+
+On-policy Monte Carlo control도 기본적으로는 GPI의 아이디어를 따른다. 여기서는 first-visit MC부터 소개한다. 앞의 MC with ES는 exploring start가 exploration을 보장해주었지만 지금은 ES부분을 떼어내는 것이 목적이므로 ES가 해주던 exploration역할을 해줄 수 있는 대체재를 사용해야한다. 이 대체재로서 위의 $\epsilon$-greedy를 사용하면 exploration을 보장할 수 있게 된다. Pseudocode는 다음과 같다.
