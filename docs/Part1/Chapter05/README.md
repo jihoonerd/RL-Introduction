@@ -109,3 +109,33 @@ Pseudocode를 자세히 살펴보자. 우선 정책 $\pi$와 행동가치함수 
 On-policy control에서 정책은 일반적으로 soft하다. Soft 정책의 의미는 모든 정책함수의 결과가 모든 상태, 행동에 대해서 양수를 갖는 경우이다. $(\pi (a \mid s))$ 모든 행동이 선택될 확률이 열려있는 것이다. 그리고 학습이 진행되면서 최적정책쪽으로 정책확률분포가 이동하게 될 것이다. 여기서 제시하는 on-policy 방법은 $\epsilon$-greedy 정책을 사용한다. $\epsilon$의 확률로 random action을 선택하고 $(1-\epsilon)$의 확률로 추저한 행동가치에 대해 greedy한 선택을 한다. 이러한 방식은 매우 간단한 방법이지만 다양한 환경에서 꽤나 유용한 정책임이 확인되었다. 즉, nongreedy로 행동을 선택할 때는 모든 행동공간에서 선택될 가능성이 열려있고 최소한 $\frac{\epsilon}{\lvert \mathcal{A}(\boldsymbol{s}) \rvert}$의 확률은 선택될 가능성이 보장된다. 그리고 greedy한 선택을 하면 nongreedy의 경우까지 포함해 $1-\epsilon + \frac{\epsilon}{\lvert \mathcal{A} (\boldsymbol{s})\rvert}$의 확률을 갖게 된다. $\epsilon$-greedy는 $\epsilon$-soft에 속하는 방법으로 $\pi(a \mid s) \geq \frac{\varepsilon}{|\mathcal{A}(s)|}$를 모든 상태와 공간에 대해 보장해준다.
 
 On-policy Monte Carlo control도 기본적으로는 GPI의 아이디어를 따른다. 여기서는 first-visit MC부터 소개한다. 앞의 MC with ES는 exploring start가 exploration을 보장해주었지만 지금은 ES부분을 떼어내는 것이 목적이므로 ES가 해주던 exploration역할을 해줄 수 있는 대체재를 사용해야한다. 이 대체재로서 위의 $\epsilon$-greedy를 사용하면 exploration을 보장할 수 있게 된다. Pseudocode는 다음과 같다.
+
+<figure align=center>
+<img src="assets/images/Chapter05/on-policy_mc_control.png" width=100% height=100%/>
+<figcaption></figcaption>
+</figure>
+
+Hyperparameter로 exploration할 확률 $\epsilon$을 정의하고 정책은 $\epsilon$-soft로, $Q(s,a)$는 임의의 값으로 초기화한다. Return을 저장할 리스트도 준비한다. MC 방법인 만큼 episode전체를 진행한 뒤 업디이트가 이루어진다. 앞서 정의한 $\epsilon$-soft에 의해 episode를 진행해 trajectory를 얻는다. 앞의 MC방법과 마찬가지로 마지막 상태에서부터 역순으로 return을 계산하기 시작한다. 따라서 역순으로 올 때 timestep $t$에서의 return은 $G \leftarrow \gamma G+R_{t+1}$이다. First-visit MC이므로 $S_{t}, A_{t}$가 trajectory에서 등장할지 않을때까지 이어지는 과정을 반복한다. 계산한 return $G$를 시작할 때 정의한 return table에서 $S_{t}, A_{t}$칸에 기록한다. 그리고 MC이므로 $Q(S_{t}, A_{t})$의 값은 return table의 $(S_t, A_t)$에 해당하는 값들의 평균으로 추정한다. 그리고 timestep $t$의 상태에서 방금 update한 $Q$를 이용해 가장 높은 행동가치를 제공하는 행동을 $A^{*}$로 assign한다. 이제 정책을 update하게 되는데 timestep $t$의 상태에 대한 모든 action을 다음의 규칙에 따라 확률을 정의한다.
+$$\pi\left(a \mid S_{t}\right) \leftarrow\left\{\begin{array}{ll}
+1-\varepsilon+\varepsilon /\left|\mathcal{A}\left(S_{t}\right)\right| & \text { if } a=A^{*} \\
+\varepsilon /\left|\mathcal{A}\left(S_{t}\right)\right| & \text { if } a \neq A^{*}
+\end{array}\right.$$
+가장 높은 행동가치를 제공한 행동이외에는 $\epsilon/\lvert \mathcal{A}(S_t) \rvert$의 확률을 나누어 갖게 된다.
+
+Policy improvement theorem에 의해 $\pi$에 대해 $\epsilon$-soft 방식이 $q_{\pi}$를 개선하는 것을 보장할 수 있다. $\pi^{\prime}$이 $\epsilon$-greedy라고 해보자. $q_{\pi}(s, \pi^{\prime}(s))$에서 정책 $\pi{\prime}$은 확률적으로 정의된다. 모든 가능한 행동에 대해서 행동가치는 다음과 같이 기댓값의 형태로 표현이 가능하다.
+
+$$q_{\pi}\left(s, \pi^{\prime}(s)\right) =\sum_{a} \pi^{\prime}(a \mid s) q_{\pi}(s, a)$$
+
+앞서 다룬 바에 따라 다음도 성립한다.
+
+$$
+\begin{aligned}
+q_{\pi}\left(s, \pi^{\prime}(s)\right) &=\sum_{a} \pi^{\prime}(a \mid s) q_{\pi}(s, a) \\
+&=\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+(1-\varepsilon) \max _{a} q_{\pi}(s, a) \\
+& \geq \frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+(1-\varepsilon) \sum_{a} \frac{\pi(a \mid s)-\frac{\varepsilon}{|\mathcal{A}(s)|}}{1-\varepsilon} q_{\pi}(s, a) \\
+&=\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)-\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+\sum_{a} \pi(a \mid s) q_{\pi}(s, a) \\
+&=v_{\pi}(s)
+\end{aligned}
+$$
+
+따라서 policy imporvement theorem에 의해 $\pi^{\prime} \geq \pi$로 개선을 보장하게 된다. 등호는 최적정책에 도달했을 때이다.
