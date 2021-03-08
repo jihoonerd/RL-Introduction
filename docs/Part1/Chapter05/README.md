@@ -131,11 +131,29 @@ $$q_{\pi}\left(s, \pi^{\prime}(s)\right) =\sum_{a} \pi^{\prime}(a \mid s) q_{\pi
 $$
 \begin{aligned}
 q_{\pi}\left(s, \pi^{\prime}(s)\right) &=\sum_{a} \pi^{\prime}(a \mid s) q_{\pi}(s, a) \\
-&=\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+(1-\varepsilon) \max _{a} q_{\pi}(s, a) \\
+&=\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+(1-\varepsilon) \max _{a} q_{\pi}(s, a) \tag{5.2} \\
 & \geq \frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+(1-\varepsilon) \sum_{a} \frac{\pi(a \mid s)-\frac{\varepsilon}{|\mathcal{A}(s)|}}{1-\varepsilon} q_{\pi}(s, a) \\
 &=\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)-\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a)+\sum_{a} \pi(a \mid s) q_{\pi}(s, a) \\
 &=v_{\pi}(s)
 \end{aligned}
 $$
 
-따라서 policy imporvement theorem에 의해 $\pi^{\prime} \geq \pi$로 개선을 보장하게 된다. 등호는 최적정책에 도달했을 때이다.
+따라서 policy imporvement theorem에 의해 $\pi^{\prime} \geq \pi$로 개선을 보장하게 된다. 등호는 최적정책에 도달했을 때이다. 이 등호조건을 증명해보자. 등호조건은 $\pi^{\prime}$과 $\pi$가 $\epsilon$-soft 정책중에서 최적정책일 떄에 한해서 성립한다.
+
+기존환경과 동일한 새로운 환경이 있다고 해보자. 새로운 환경은 기존환경과 동일한 상태와 행동을 갖고 있다고 하자. 이 떄 새로운 환경에서 할 수 있는 최선은 기존환경의 정책을 $\epsilon$-soft로 사용하는 것이다. 새로운 환경에서의 최적가치함수를 각각 $\tilde{v_{*}}$,, $\tilde{q_{*}}$라고 하면 정책 $\pi$는 모든 $\epsilon$-soft 정책들 중에서 $v_{\pi} = \tilde{v_{*}}$일 때 최적정책이 된다. 상태가치 정의에 의해 $\tilde{v_{*}}$는 다음과 같다.
+$$\begin{aligned}
+\widetilde{v}_{*}(s)=&(1-\varepsilon) \max _{a} \widetilde{q}_{*}(s, a)+\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} \widetilde{q}_{*}(s, a) \\
+=&(1-\varepsilon) \max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma \widetilde{v}_{*}\left(s^{\prime}\right)\right] \\
++& \frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma \widetilde{v}_{*}\left(s^{\prime}\right)\right]
+\end{aligned}$$
+등호는 $\epsilon$-soft 정책 $\pi$가 더 이상 개선되지 않을 때이다. 따라서 가치함수가 최적함수이므로 다음이 성립하며 이는 (5.2)에 의해 다음과 같다.
+$$
+\begin{aligned}
+v_{\pi}(s)=&(1-\varepsilon) \max _{a} q_{\pi}(s, a)+\frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} q_{\pi}(s, a) \\
+=&(1-\varepsilon) \max _{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right] \\
++& \frac{\varepsilon}{|\mathcal{A}(s)|} \sum_{a} \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+최적정책은 유일하므로 $v_{\pi} = \tilde{v_{*}}$이다.
+
+정리하면, $\epsilon$-soft를 정책으로 사용할 때 policy iteration으로 사용할 수 있고 정책의 개선도 보장된다는 것이 핵심이다. $\epsilon$-soft를 사용함으로써 exploring starts를 하지 않아도 된다는 점이 장점이다. 
