@@ -157,3 +157,12 @@ $$
 최적정책은 유일하므로 $v_{\pi} = \tilde{v_{*}}$이다.
 
 정리하면, $\epsilon$-soft를 정책으로 사용할 때 policy iteration으로 사용할 수 있고 정책의 개선도 보장된다는 것이 핵심이다. $\epsilon$-soft를 사용함으로써 exploring starts를 하지 않아도 된다는 점이 장점이다. 
+
+## Off-policy Prediction via Importance Sampling
+
+모든 control 방법은 다음 두 가지를 동시에 달성하여야 한다.
+
+* 알고있는 최적행동 정보를 통해 행동가치를 학습하여야 한다.
+* 모든 행동에 대해서 탐색해(explore) 더 좋은 행동을 찾아야 하므로 최적행동이 아닌 행동에 대한 탐색을 해야한다.
+
+최적행동을 선택하면서 최적행동이외의 다른행동에 대해 탐색할 수 없기 때문에 이 두 가지는 동시에 진행할 수 없는 과정이다. 하지만 두 가지 모두 최적정책을 찾기 위해서는 필수적인 과정이기도 하다. 앞서 다룬 on-policy 방식은 이에 대해 최적 정책이 아닌 현재 정책에 대해 가치함수를 학습하는 방식으로 타협한 방법으로 볼 수 있다. 애초에 최적정책을 찾아야 하는데 최적정책을 사용할 수는 없으므로 불가피한 타협이기는 하다. Target policy와 behavior policy를 따로 두는 방법도 생각해 볼 수 있다. 이 두가지는 Deep RL에서도 자주 등장하는 개념으로 학습을 통해 개선시키는, 즉 최적정책으로 나아가는 정책을 target policy라고 하며, 행동을 만들어내는 정책을 따로 두어 behavior policy라고 한다. Behavior policy에 탐색을 하는 성질을 부여하면 위의 두 가지 목적을 달성할 수 있다. 여기서 on-policy와 구분되는 차이가 발생한다. On-policy는 target policy와 behavior policy가 같았다면, off-policy에서는 target policy와 behavior policy가 달라진다. 그리고 이러한 방식을 off-policy learning이라고 한다.
